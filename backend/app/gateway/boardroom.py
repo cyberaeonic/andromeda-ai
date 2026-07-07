@@ -55,7 +55,9 @@ def get_boardroom_graph(model_name: str, app_config):
     design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([create_ui_design])
 
     CEO_PROMPT = """You are the CEO of Andromeda AI. Your job is to moderate the boardroom discussion.
-A user has submitted a request. Review it, and ask the relevant departments for their input.
+A user has submitted a request. Review it.
+CRITICAL RULE: If the request is NOT a business, startup, technology, or finance-related query, you MUST politely refuse to answer and set next_speaker to END immediately. Do not answer general knowledge questions.
+If it IS a business query, ask the relevant departments for their input.
 DO NOT CALL EVERYONE. Only pick the specific departments needed (Finance, Marketing, Developer, Business, Sales, Legal, Design).
 If a department has already spoken, DO NOT call them again.
 Once the required departments have weighed in, summarize the final decision and end the meeting by setting next_speaker to END.
