@@ -42,8 +42,10 @@ COPY --from=uv-source /uv /uvx /usr/local/bin/
 # Set working directory
 WORKDIR /app
 
-# Copy backend source code
+# Copy backend source code and config
 COPY backend ./backend
+COPY config.yaml ./config.yaml
+COPY skills ./skills
 
 # Install dependencies with cache mount
 # `redis` is always installed because Docker Compose defaults the stream bridge
@@ -107,6 +109,8 @@ WORKDIR /app
 
 # Copy backend with pre-built virtualenv from builder
 COPY --from=builder /app/backend ./backend
+COPY --from=builder /app/config.yaml ./config.yaml
+COPY --from=builder /app/skills ./skills
 
 # Expose Gateway API port.
 EXPOSE 8001
