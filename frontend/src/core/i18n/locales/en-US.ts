@@ -220,6 +220,7 @@ export const enUS: Translations = {
     recentChats: "Recent chats",
     demoChats: "Demo chats",
     agents: "Agents",
+    dataStudio: "Data Studio",
     scheduledTasks: "Business Order Schedule",
     agentsDisabledTooltip: "Feature not enabled",
   },
