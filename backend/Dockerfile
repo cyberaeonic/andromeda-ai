@@ -77,8 +77,7 @@ ENV PYTHONIOENCODING=utf-8
 # source distributions in development containers.
 FROM builder AS dev
 
-# Install Docker CLI (for DooD: allows starting sandbox containers via host Docker socket)
-COPY --from=docker:cli /usr/local/bin/docker /usr/local/bin/docker
+# (Removed Docker CLI install because DooD is not supported on Railway and caused rate limits)
 
 EXPOSE 8001
 
@@ -98,8 +97,7 @@ COPY --from=builder /usr/lib/node_modules /usr/lib/node_modules
 RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/bin/npm \
     && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/bin/npx
 
-# Install Docker CLI (for DooD: allows starting sandbox containers via host Docker socket)
-COPY --from=docker:cli /usr/local/bin/docker /usr/local/bin/docker
+# (Removed Docker CLI install because DooD is not supported on Railway and caused rate limits)
 
 # Install uv (source image overridable via UV_IMAGE build arg)
 COPY --from=uv-source /uv /uvx /usr/local/bin/
