@@ -64,9 +64,21 @@ Once the required departments have weighed in, summarize the final decision and 
 You MUST output JSON in exactly this format:
 {"response": "Finance, please analyze the budget.", "next_speaker": "Finance"}"""
 
-    FINANCE_PROMPT = "You are the Finance Agent. Provide conservative financial estimates. You MUST use your get_crypto_price tool if relevant. Fiercely debate and reject expensive ideas from other agents."
-    MARKETING_PROMPT = "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. Disagree with Finance if they are too conservative."
-    DEV_PROMPT = "You are the Developer Agent. Focus on technical feasibility. You MUST use your search_github tool to find existing code. Reject impossible ideas."
+    FINANCE_PROMPT = (
+        "You are the Finance Agent. Provide conservative financial estimates. "
+        "You MUST use your get_crypto_price tool if relevant. Fiercely debate and reject expensive ideas from other agents. "
+        "If presenting financial data, you MUST generate a sleek HTML/CSS visual chart directly in your response."
+    )
+    MARKETING_PROMPT = (
+        "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. "
+        "Disagree with Finance if they are too conservative. "
+        "You MUST generate HTML/CSS visual graphics or tables to illustrate your campaign strategies directly in your response."
+    )
+    DEV_PROMPT = (
+        "You are the Developer Agent. Focus on technical feasibility. "
+        "You MUST use your search_github tool to find existing code. Reject impossible ideas. "
+        "If explaining architectures or metrics, generate a sleek HTML/CSS visual chart directly in your response."
+    )
     BUSINESS_PROMPT = "You are the Business Agent. Focus on strategic partnerships. Limit response to 3 sentences."
     SALES_PROMPT = "You are the Sales Agent. Focus on lead generation and maximizing revenue. Limit response to 3 sentences."
     LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance and minimizing liability risk. Limit response to 3 sentences."
@@ -125,7 +137,14 @@ You MUST output JSON in exactly this format:
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "get_crypto_price":
                     tool_res = get_crypto_price.invoke(tool_call["args"])
-                    content += f"\n\n*[System: Fetched Market Data for {tool_call['args'].get('coin_id', 'asset')} - {tool_res}]*"
+                    coin = tool_call["args"].get("coin_id", "asset")
+                    content += f"""
+<div class="bg-slate-900 text-emerald-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-emerald-900/50">
+  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Finance.MarketTracker]</span></div>
+  <div class="text-slate-400">> Querying live market data for: {coin}...</div>
+  <div class="text-slate-400">> Establishing secure connection to exchange APIs...</div>
+  <div class="text-emerald-500 mt-2 font-bold">[Success] {tool_res}</div>
+</div>"""
         return {"messages": [AIMessage(content=content, name="Finance Agent")]}
 
     async def marketing_node(state: BoardroomState, config: RunnableConfig):
@@ -148,7 +167,14 @@ You MUST output JSON in exactly this format:
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "search_github":
                     tool_res = search_github.invoke(tool_call["args"])
-                    content += f"\n\n*[System: Searched GitHub - {tool_res}]*"
+                    query = tool_call["args"].get("query", "code")
+                    content += f'''
+<div class="bg-slate-900 text-blue-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-blue-900/50">
+  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Developer.GitHubSearch]</span></div>
+  <div class="text-slate-400">> Scanning global repositories for: "{query}"...</div>
+  <div class="text-slate-400">> Analyzing code architecture and stars...</div>
+  <div class="text-blue-500 mt-2 font-bold">[Success] {tool_res}</div>
+</div>'''
         return {"messages": [AIMessage(content=content, name="Developer Agent")]}
 
     async def business_node(state: BoardroomState, config: RunnableConfig):
@@ -187,7 +213,15 @@ You MUST output JSON in exactly this format:
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "create_ui_design":
                     tool_res = create_ui_design.invoke(tool_call["args"])
-                    content += f"\n\n{tool_res}"
+                    comp = tool_call["args"].get("component_name", "UI Component")
+                    content += f"""
+<div class="bg-slate-900 text-purple-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-purple-900/50">
+  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Design.UI_Generator]</span></div>
+  <div class="text-slate-400">> Bootstrapping React component: {comp}...</div>
+  <div class="text-slate-400">> Compiling TailwindCSS tokens and resolving dependencies...</div>
+  <div class="text-purple-500 mt-2 font-bold">[Success] Component successfully deployed to Workspace panel.</div>
+</div>
+{tool_res}"""
         return {"messages": [AIMessage(content=content, name="Design Agent")]}
 
     def router(state: BoardroomState):

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { type ClipboardSafeStreamdownProps } from "@/components/ai-elements/streamdown";
 import {
   preprocessStreamdownMarkdown,
-  streamdownPluginsWithoutRawHtml,
+  streamdownPlugins,
 } from "@/core/streamdown";
 import { SafeMessageResponse } from "@/core/streamdown/components";
 
@@ -26,7 +26,7 @@ export function MarkdownContent({
   isLoading,
   rehypePlugins,
   className,
-  remarkPlugins = streamdownPluginsWithoutRawHtml.remarkPlugins,
+  remarkPlugins = streamdownPlugins.remarkPlugins,
   components: componentsFromProps,
 }: MarkdownContentProps) {
   const normalizedContent = useMemo(
@@ -34,7 +34,7 @@ export function MarkdownContent({
     [content],
   );
   const effectiveRehypePlugins = useMemo(() => {
-    const base = streamdownPluginsWithoutRawHtml.rehypePlugins ?? [];
+    const base = streamdownPlugins.rehypePlugins ?? [];
     const extra = rehypePlugins ?? [];
     return [...base, ...extra] as ClipboardSafeStreamdownProps["rehypePlugins"];
   }, [rehypePlugins]);
