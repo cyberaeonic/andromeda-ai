@@ -69,7 +69,13 @@ export const MessageContent = ({
                   ? "bg-orange-500"
                   : agentName.toLowerCase().includes("developer")
                     ? "bg-blue-500"
-                    : "bg-slate-500",
+                    : agentName.toLowerCase().includes("business")
+                      ? "bg-indigo-500"
+                      : agentName.toLowerCase().includes("sales")
+                        ? "bg-rose-500"
+                        : agentName.toLowerCase().includes("legal")
+                          ? "bg-amber-500"
+                          : "bg-slate-500",
           )}
         >
           {agentName.charAt(0)}
