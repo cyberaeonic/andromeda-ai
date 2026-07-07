@@ -56,4 +56,4 @@ Built on an internal agent-platform scaffold, extended with custom autonomous wo
 
 ---
 
-© 2025 Cyberaeonic. Built for [HACKATHON NAME HERE].
+© Built for Takeover hackthon NIAT.
