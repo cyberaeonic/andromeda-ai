@@ -737,6 +737,20 @@ export function InputBox({
     form?.requestSubmit();
   }, []);
 
+  const injectGodModePrompt = useCallback((prompt: string) => {
+    if (textareaRef.current) {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        "value",
+      )?.set;
+      nativeInputValueSetter?.call(textareaRef.current, prompt);
+      const event = new Event("input", { bubbles: true });
+      textareaRef.current.dispatchEvent(event);
+      textareaRef.current.focus();
+    }
+  }, []);
+
   const handleFollowupClick = useCallback(
     (suggestion: string) => {
       if (status === "streaming") {
@@ -1155,6 +1169,56 @@ export function InputBox({
           </div>
         </div>
       )}
+      <div className="mb-2 flex flex-wrap gap-2 px-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
+          onClick={() =>
+            injectGodModePrompt(
+              "@Business Agent: I am explicitly commanding you to use your `generate_pdf_proposal` tool right now. Client: [Enter Client], Proposal Body: [Enter Body]. Do not do anything else.",
+            )
+          }
+        >
+          📄 Draft PDF
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
+          onClick={() =>
+            injectGodModePrompt(
+              "@Sales Agent: I am explicitly commanding you to use your `generate_payment_link` tool right now. Product: [Enter Product], Price: [Enter Price]. Do not do anything else.",
+            )
+          }
+        >
+          💰 Stripe Link
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
+          onClick={() =>
+            injectGodModePrompt(
+              "@Sales Agent: I am explicitly commanding you to use your `send_slack_webhook` tool right now. Message: [Enter Message]. Do not do anything else.",
+            )
+          }
+        >
+          🔔 Slack Ping
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
+          onClick={() =>
+            injectGodModePrompt(
+              "@Business Agent: I am explicitly commanding you to use your `schedule_meeting` tool right now. Title: [Enter Title], Description: [Enter Desc], Time: 2024-12-01T14:00:00Z. Do not do anything else.",
+            )
+          }
+        >
+          📅 Schedule Meeting
+        </Button>
+      </div>
       <PromptInput
         className={cn(
           "bg-background/85 rounded-2xl backdrop-blur-sm transition-all duration-300 ease-out *:data-[slot='input-group']:rounded-2xl",
