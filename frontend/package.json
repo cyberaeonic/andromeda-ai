@@ -2,7 +2,6 @@
   "name": "andromeda-ai-frontend",
   "version": "2.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "demo:save": "node scripts/save-demo.js",
     "build": "next build",
