@@ -1172,7 +1172,7 @@ export function InputBox({
       <div className="mb-2 flex flex-wrap gap-2 px-2">
         <div className="flex w-full items-center gap-2">
           <span className="text-[10px] font-bold text-[#dabb5e] uppercase">
-            Hackathon Demo Script:
+            Quick Actions:
           </span>
           <Button
             variant="default"
@@ -1184,7 +1184,7 @@ export function InputBox({
               )
             }
           >
-            🎬 Demo 1: Research & CRM
+            🎬 Step 1: Research & CRM
           </Button>
           <Button
             variant="default"
@@ -1196,7 +1196,7 @@ export function InputBox({
               )
             }
           >
-            🎬 Demo 2: PDF & Calendar
+            🎬 Step 2: PDF & Calendar
           </Button>
           <Button
             variant="default"
@@ -1208,7 +1208,7 @@ export function InputBox({
               )
             }
           >
-            🎬 Demo 3: Stripe & Slack
+            🎬 Step 3: Stripe & Slack
           </Button>
           <Button
             variant="default"
@@ -1220,7 +1220,7 @@ export function InputBox({
               )
             }
           >
-            🎬 Demo 4: Email Outreach
+            🎬 Step 4: Email Outreach
           </Button>
         </div>
       </div>

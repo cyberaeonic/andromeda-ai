@@ -155,6 +155,15 @@ def send_slack_webhook(message: str) -> str:
         return f"Failed to ping Slack: {e}"
 
 
+@tool
+def generate_ui_mockup(prompt: str) -> str:
+    """Design tool to generate a UI mockup image. ONLY use if explicitly requested."""
+    import urllib.parse
+
+    encoded = urllib.parse.quote(prompt[:50] + " Mockup")
+    return f"![UI Mockup](https://placehold.co/800x600/1e1e1e/dabb5e/png?text={encoded})"
+
+
 def get_boardroom_graph(model_name: str, app_config):
     """Builds a multi-agent boardroom graph."""
 
@@ -167,7 +176,7 @@ def get_boardroom_graph(model_name: str, app_config):
     business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, generate_pdf_proposal, schedule_meeting])
     sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, add_crm_lead, generate_payment_link, send_slack_webhook])
     legal_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
-    design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
+    design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([generate_ui_mockup])
 
     CEO_PROMPT = (
         "You are the CEO of Andromeda AI. Your job is to route workflows and moderate the boardroom discussion.\n"
@@ -197,7 +206,13 @@ def get_boardroom_graph(model_name: str, app_config):
         "You may provide a brief, professional summary explaining the results of your tool executions and strategic reasoning. Avoid meaningless conversational filler."
     )
     LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance. Provide a brief, professional summary, but avoid meaningless conversational filler."
-    DESIGN_PROMPT = "You are the Design Agent. Output ONLY React code using markdown code blocks. DO NOT use conversational filler."
+    DESIGN_PROMPT = (
+        "You are the Design Agent. You can generate UI mockups using `generate_ui_mockup`, "
+        "but ONLY if the user explicitly asks for an image/design. "
+        "Output the generated image markdown directly. "
+        "DO NOT output HTML/React code unless explicitly asked for code. "
+        "DO NOT use conversational filler."
+    )
 
     async def ceo_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
@@ -252,16 +267,7 @@ def get_boardroom_graph(model_name: str, app_config):
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "web_search":
                     tool_res = web_search_tool.invoke(tool_call["args"])
-                    query = tool_call["args"].get("query", "data")
-                    content += f"""
-```terminal
-[Agent: Finance.MarketTracker] Invoking Web Search...
-> Querying live data for: {query}
-> Establishing secure connection...
-
-[Success] {tool_res[:300]}...
-```
-"""
+                    content += f"\n✅ **[Finance.MarketTracker]** Fetched live data: {tool_res[:100]}...\n"
         return {"messages": [AIMessage(content=content, name="Finance Agent")]}
 
     async def marketing_node(state: BoardroomState, config: RunnableConfig):
@@ -284,15 +290,7 @@ def get_boardroom_graph(model_name: str, app_config):
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "web_search":
                     tool_res = web_search_tool.invoke(tool_call["args"])
-                    query = tool_call["args"].get("query", "code")
-                    content += f"""
-```terminal
-[Agent: Developer.GitHubSearch] Scanning global repositories...
-> Querying: "{query}"
-
-[Success] {tool_res[:300]}...
-```
-"""
+                    content += f"\n✅ **[Developer.GitHubSearch]** Scanned global repositories: {tool_res[:100]}...\n"
         return {"messages": [AIMessage(content=content, name="Developer Agent")]}
 
     async def business_node(state: BoardroomState, config: RunnableConfig):
@@ -305,53 +303,22 @@ def get_boardroom_graph(model_name: str, app_config):
         if resp.tool_calls:
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "web_search":
-                    tool_res = web_search_tool.invoke(tool_call["args"])
+                    web_search_tool.invoke(tool_call["args"])
                     query = tool_call["args"].get("query", "partners")
-                    content += f"""
-```terminal
-[Agent: Business] Invoking Web Search...
-> Querying: "{query}"
-
-[Success] {tool_res[:300]}...
-```
-"""
+                    content += f"\n✅ **[Business.WebSearch]** Searched for: {query}\n"
                 elif tool_call["name"] == "send_email":
-                    tool_res = send_email.invoke(tool_call["args"])
+                    send_email.invoke(tool_call["args"])
                     to = tool_call["args"].get("to_address", "target")
                     subj = tool_call["args"].get("subject", "outreach")
-                    content += f"""
-```terminal
-[Agent: Business.Outreach] Preparing Email Transmission...
-> Target: {to}
-> Subject: {subj}
-
-{tool_res}
-```
-"""
+                    content += f"\n✅ **[Business.Outreach]** Sent email to {to} (Subject: {subj})\n"
                 elif tool_call["name"] == "generate_pdf_proposal":
-                    tool_res = generate_pdf_proposal.invoke(tool_call["args"])
+                    generate_pdf_proposal.invoke(tool_call["args"])
                     client = tool_call["args"].get("client_name", "Client")
-                    content += f"""
-```terminal
-[Agent: Business.Docs] Bootstrapping PDF Generation Engine...
-> Document Type: Proposal
-> Client: {client}
-> Rendering typography and typesetting elements...
-
-[Success] {tool_res}
-```
-"""
+                    content += f"\n✅ **[Business.Docs]** Generated PDF Proposal for {client}\n"
                 elif tool_call["name"] == "schedule_meeting":
-                    tool_res = schedule_meeting.invoke(tool_call["args"])
+                    schedule_meeting.invoke(tool_call["args"])
                     title = tool_call["args"].get("title", "Meeting")
-                    content += f"""
-```terminal
-[Agent: Business.Calendar] Writing standard ICS calendar payload...
-> Event Title: {title}
-
-[Success] {tool_res}
-```
-"""
+                    content += f"\n✅ **[Business.Calendar]** Scheduled Kickoff Meeting: {title}\n"
         return {"messages": [AIMessage(content=content, name="Business Agent")]}
 
     async def sales_node(state: BoardroomState, config: RunnableConfig):
@@ -364,65 +331,26 @@ def get_boardroom_graph(model_name: str, app_config):
         if resp.tool_calls:
             for tool_call in resp.tool_calls:
                 if tool_call["name"] == "web_search":
-                    tool_res = web_search_tool.invoke(tool_call["args"])
+                    web_search_tool.invoke(tool_call["args"])
                     query = tool_call["args"].get("query", "leads")
-                    content += f"""
-```terminal
-[Agent: Sales] Invoking Web Search...
-> Querying: "{query}"
-
-[Success] {tool_res[:300]}...
-```
-"""
+                    content += f"\n✅ **[Sales.WebSearch]** Searched for: {query}\n"
                 elif tool_call["name"] == "send_email":
-                    tool_res = send_email.invoke(tool_call["args"])
+                    send_email.invoke(tool_call["args"])
                     to = tool_call["args"].get("to_address", "lead")
                     subj = tool_call["args"].get("subject", "outreach")
-                    content += f"""
-```terminal
-[Agent: Sales.Outreach] Preparing Email Transmission...
-> Target: {to}
-> Subject: {subj}
-
-{tool_res}
-```
-"""
+                    content += f"\n✅ **[Sales.Outreach]** Sent email to {to} (Subject: {subj})\n"
                 elif tool_call["name"] == "add_crm_lead":
-                    tool_res = add_crm_lead.invoke(tool_call["args"])
+                    add_crm_lead.invoke(tool_call["args"])
                     name = tool_call["args"].get("name", "Unknown")
                     comp = tool_call["args"].get("company", "Unknown")
-                    content += f"""
-```terminal
-[Agent: Sales.CRM] Updating local CRM database...
-> Lead: {name} ({comp})
-
-[Success] {tool_res}
-```
-"""
+                    content += f"\n✅ **[Sales.CRM]** Added lead to CRM: {name} ({comp})\n"
                 elif tool_call["name"] == "generate_payment_link":
                     tool_res = generate_payment_link.invoke(tool_call["args"])
                     prod = tool_call["args"].get("product_name", "Product")
-                    price = tool_call["args"].get("price_usd", "0")
-                    content += f"""
-```terminal
-[Agent: Sales.Payments] Generating Stripe Checkout URL...
-> Product: {prod}
-> Price: ${price}
-
-[Success] Generated Link: {tool_res}
-```
-"""
+                    content += f"\n✅ **[Sales.Payments]** Generated Stripe Checkout URL for {prod}: {tool_res}\n"
                 elif tool_call["name"] == "send_slack_webhook":
-                    tool_res = send_slack_webhook.invoke(tool_call["args"])
-                    msg = tool_call["args"].get("message", "Ping")
-                    content += f"""
-```terminal
-[Agent: Sales.Comms] Pinging team Slack channel...
-> Payload: "{msg[:50]}..."
-
-{tool_res}
-```
-"""
+                    send_slack_webhook.invoke(tool_call["args"])
+                    content += "\n✅ **[Sales.Comms]** Pinged team Slack channel\n"
         return {"messages": [AIMessage(content=content, name="Sales Agent")]}
 
     async def legal_node(state: BoardroomState, config: RunnableConfig):
@@ -442,7 +370,10 @@ def get_boardroom_graph(model_name: str, app_config):
 
         content = resp.content
         if resp.tool_calls:
-            pass  # Removed create_ui_design tool
+            for tool_call in resp.tool_calls:
+                if tool_call["name"] == "generate_ui_mockup":
+                    tool_res = generate_ui_mockup.invoke(tool_call["args"])
+                    content += f"\n\n{tool_res}\n"
         return {"messages": [AIMessage(content=content, name="Design Agent")]}
 
     def router(state: BoardroomState):
