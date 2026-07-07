@@ -1,0 +1,13 @@
+Region,Product,Sales_Rep,Q3_Revenue,Q3_Target,Q2_Revenue,Units_Sold,Customer_Count,Churn_Rate,NPS_Score
+North America,Enterprise Suite,Alice Johnson,2850000,2500000,2100000,142,38,0.04,72
+North America,SMB Pro,Bob Chen,980000,1200000,1050000,490,312,0.09,61
+EMEA,Enterprise Suite,Sarah Mueller,1920000,2000000,1750000,96,28,0.03,78
+EMEA,SMB Pro,James Patel,750000,800000,680000,375,240,0.11,58
+APAC,Enterprise Suite,Yuki Tanaka,1100000,1500000,890000,55,18,0.06,65
+APAC,SMB Pro,Raj Kumar,420000,500000,390000,210,145,0.14,54
+LATAM,Enterprise Suite,Maria Santos,650000,600000,580000,32,12,0.08,69
+LATAM,SMB Pro,Carlos Mendez,280000,350000,310000,140,95,0.17,48
+North America,Analytics Add-on,Alice Johnson,560000,500000,420000,280,180,0.05,74
+EMEA,Analytics Add-on,Sarah Mueller,390000,400000,340000,195,120,0.04,76
+APAC,Analytics Add-on,Yuki Tanaka,210000,300000,180000,105,65,0.09,62
+LATAM,Analytics Add-on,Carlos Mendez,95000,150000,80000,47,30,0.19,45
