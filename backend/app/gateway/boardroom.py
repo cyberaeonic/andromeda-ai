@@ -11,6 +11,10 @@ from deerflow.models import create_chat_model
 logger = logging.getLogger(__name__)
 
 
+class BoardroomState(ThreadState):
+    next_speaker: str
+
+
 # Mock business tools for the hackathon
 def calculate_profit_margin(revenue: float, costs: float) -> str:
     """Finance tool to calculate profit margin."""
@@ -39,18 +43,24 @@ def get_boardroom_graph(model_name: str, app_config):
     finance_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     marketing_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     dev_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
+    business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
+    sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
+    legal_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
 
     CEO_PROMPT = """You are the CEO of Andromeda AI. Your job is to moderate the boardroom discussion.
-A user has submitted a request. Review it, and ask the relevant departments (Finance, Marketing, Developer) for their input.
+A user has submitted a request. Review it, and ask the relevant departments (Finance, Marketing, Developer, Business, Sales, Legal) for their input.
 Once all departments have weighed in, summarize the final decision and end the meeting.
-You MUST output JSON with a 'next_speaker' key indicating who should speak next (Finance, Marketing, Developer, or END if the meeting is over).
+You MUST output JSON with a 'next_speaker' key indicating who should speak next (Finance, Marketing, Developer, Business, Sales, Legal, or END if the meeting is over).
 Example: {"response": "Finance, please analyze the budget.", "next_speaker": "Finance"}"""
 
     FINANCE_PROMPT = "You are the Finance Agent. Always provide conservative financial estimates and focus on ROI. Limit response to 3 sentences."
     MARKETING_PROMPT = "You are the Marketing Agent. Always focus on growth, viral loops, and brand awareness. Limit response to 3 sentences."
     DEV_PROMPT = "You are the Developer Agent. Always focus on technical feasibility and architecture. Limit response to 3 sentences."
+    BUSINESS_PROMPT = "You are the Business Agent. Always focus on strategic partnerships and splitting work efficiently. Limit response to 3 sentences."
+    SALES_PROMPT = "You are the Sales Agent. Always focus on lead generation, closing deals, and maximizing revenue. Limit response to 3 sentences."
+    LEGAL_PROMPT = "You are the Legal Agent. Always focus on compliance, terms of service, and minimizing liability risk. Limit response to 3 sentences."
 
-    async def ceo_node(state: ThreadState, config: RunnableConfig):
+    async def ceo_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
         # Find the last human message
         last_human = next((m for m in reversed(messages) if isinstance(m, HumanMessage)), None)
@@ -80,28 +90,49 @@ Example: {"response": "Finance, please analyze the budget.", "next_speaker": "Fi
 
         return {"messages": [AIMessage(content=response_text, name="CEO")], "next_speaker": next_speaker}
 
-    async def finance_node(state: ThreadState, config: RunnableConfig):
+    async def finance_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
         context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
         prompt = FINANCE_PROMPT + f"\n\nContext:\n{context}"
         resp = await finance_model.ainvoke([SystemMessage(content=prompt)], config=config)
         return {"messages": [AIMessage(content=resp.content, name="Finance Agent")]}
 
-    async def marketing_node(state: ThreadState, config: RunnableConfig):
+    async def marketing_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
         context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
         prompt = MARKETING_PROMPT + f"\n\nContext:\n{context}"
         resp = await marketing_model.ainvoke([SystemMessage(content=prompt)], config=config)
         return {"messages": [AIMessage(content=resp.content, name="Marketing Agent")]}
 
-    async def dev_node(state: ThreadState, config: RunnableConfig):
+    async def dev_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
         context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
         prompt = DEV_PROMPT + f"\n\nContext:\n{context}"
         resp = await dev_model.ainvoke([SystemMessage(content=prompt)], config=config)
         return {"messages": [AIMessage(content=resp.content, name="Developer Agent")]}
 
-    def router(state: ThreadState):
+    async def business_node(state: BoardroomState, config: RunnableConfig):
+        messages = state.get("messages", [])
+        context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
+        prompt = BUSINESS_PROMPT + f"\n\nContext:\n{context}"
+        resp = await business_model.ainvoke([SystemMessage(content=prompt)], config=config)
+        return {"messages": [AIMessage(content=resp.content, name="Business Agent")]}
+
+    async def sales_node(state: BoardroomState, config: RunnableConfig):
+        messages = state.get("messages", [])
+        context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
+        prompt = SALES_PROMPT + f"\n\nContext:\n{context}"
+        resp = await sales_model.ainvoke([SystemMessage(content=prompt)], config=config)
+        return {"messages": [AIMessage(content=resp.content, name="Sales Agent")]}
+
+    async def legal_node(state: BoardroomState, config: RunnableConfig):
+        messages = state.get("messages", [])
+        context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
+        prompt = LEGAL_PROMPT + f"\n\nContext:\n{context}"
+        resp = await legal_model.ainvoke([SystemMessage(content=prompt)], config=config)
+        return {"messages": [AIMessage(content=resp.content, name="Legal Agent")]}
+
+    def router(state: BoardroomState):
         speaker = state.get("next_speaker", "END")
         if speaker == "Finance":
             return "finance"
@@ -109,20 +140,32 @@ Example: {"response": "Finance, please analyze the budget.", "next_speaker": "Fi
             return "marketing"
         if speaker == "Developer":
             return "developer"
+        if speaker == "Business":
+            return "business"
+        if speaker == "Sales":
+            return "sales"
+        if speaker == "Legal":
+            return "legal"
         return END
 
-    workflow = StateGraph(ThreadState)
+    workflow = StateGraph(BoardroomState)
 
     workflow.add_node("ceo", ceo_node)
     workflow.add_node("finance", finance_node)
     workflow.add_node("marketing", marketing_node)
     workflow.add_node("developer", dev_node)
+    workflow.add_node("business", business_node)
+    workflow.add_node("sales", sales_node)
+    workflow.add_node("legal", legal_node)
 
     workflow.add_edge(START, "ceo")
-    workflow.add_conditional_edges("ceo", router, {"finance": "finance", "marketing": "marketing", "developer": "developer", END: END})
+    workflow.add_conditional_edges("ceo", router, {"finance": "finance", "marketing": "marketing", "developer": "developer", "business": "business", "sales": "sales", "legal": "legal", END: END})
 
     workflow.add_edge("finance", "ceo")
     workflow.add_edge("marketing", "ceo")
     workflow.add_edge("developer", "ceo")
+    workflow.add_edge("business", "ceo")
+    workflow.add_edge("sales", "ceo")
+    workflow.add_edge("legal", "ceo")
 
     return workflow.compile()
