@@ -157,11 +157,13 @@ def send_slack_webhook(message: str) -> str:
 
 @tool
 def generate_ui_mockup(prompt: str) -> str:
-    """Design tool to generate a UI mockup image. ONLY use if explicitly requested."""
+    """Design tool to generate a UI mockup image based on a prompt. ONLY use if explicitly requested."""
     import urllib.parse
 
-    encoded = urllib.parse.quote(prompt[:50] + " Mockup")
-    return f"![UI Mockup](https://placehold.co/800x600/1e1e1e/dabb5e/png?text={encoded})"
+    # Use pollinations.ai for real on-the-fly generative AI imagery.
+    enhanced_prompt = f"sleek modern enterprise UI mockup, {prompt}, dark mode, high quality UI design"
+    encoded = urllib.parse.quote(enhanced_prompt)
+    return f"![Generated UI Design](https://image.pollinations.ai/prompt/{encoded}?width=800&height=600&nologo=true)"
 
 
 def get_boardroom_graph(model_name: str, app_config):
