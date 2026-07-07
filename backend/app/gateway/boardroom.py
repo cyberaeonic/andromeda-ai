@@ -170,37 +170,34 @@ def get_boardroom_graph(model_name: str, app_config):
     design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
 
     CEO_PROMPT = (
-        "You are the CEO of Andromeda AI. Your job is to moderate the boardroom discussion.\n"
-        "A user has submitted a request. Review it and ask the relevant departments for their input.\n"
-        "CRITICAL RULE: You must treat EVERY query from a strict business, corporate, and monetization perspective. "
-        "If the user asks about everyday topics (like food or sports), analyze the market size, sponsorships, or monetization potential. "
-        "Always think like a ruthless executive.\n"
+        "You are the CEO Workflow Router of Andromeda AI.\n"
+        "A user has submitted a request. Identify the required execution tools.\n"
+        "CRITICAL RULE: DO NOT use conversational filler, pleasantries, or explanations. You are a rigid routing program.\n"
         "DO NOT CALL EVERYONE. Only pick the specific departments needed (Finance, Marketing, Developer, Business, Sales, Legal, Design).\n"
         "If a department has already spoken, DO NOT call them again.\n"
-        "Once the required departments have weighed in, summarize the final decision and end the meeting by setting next_speaker to END.\n"
+        "Once all necessary tools have been executed by departments, end the workflow by setting next_speaker to END.\n"
         "You MUST output JSON in exactly this format:\n"
-        '{"response": "Finance, please analyze the budget.", "next_speaker": "Finance"}'
+        '{"response": "Executing Sales tools for lead generation.", "next_speaker": "Sales"}'
     )
 
     FINANCE_PROMPT = (
-        "You are the Finance Agent. Provide conservative financial estimates. You MUST use your web_search_tool to fetch real market data, stock prices, or income reports. Fiercely debate and reject expensive ideas from other agents."
+        "You are the Finance Execution Node. CRITICAL RULE: DO NOT use conversational filler. You are a rigid software program. "
+        "You MUST use your web_search_tool to fetch real market data. Your text response MUST be a maximum of 1 concise sentence summarizing the tool execution."
     )
-    MARKETING_PROMPT = "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. Disagree with Finance if they are too conservative. "
-    DEV_PROMPT = "You are the Developer Agent. Focus on technical feasibility. You MUST use your web_search_tool to search GitHub, StackOverflow, or documentation for existing solutions. Reject impossible ideas."
+    MARKETING_PROMPT = "You are the Marketing Execution Node. CRITICAL RULE: DO NOT use conversational filler. Your text response MUST be a maximum of 1 concise sentence."
+    DEV_PROMPT = "You are the Developer Execution Node. CRITICAL RULE: DO NOT use conversational filler. You MUST use your web_search_tool to search GitHub/StackOverflow. Your text response MUST be a maximum of 1 concise sentence."
     BUSINESS_PROMPT = (
-        "You are the Business Agent. Focus on strategic partnerships. "
-        "You can use web_search_tool to find partners, send_email to reach out, "
-        "generate_pdf_proposal to draft official documents, and schedule_meeting to create calendar invites. "
-        "Limit response to 4 sentences."
+        "You are the Business Execution Node. CRITICAL RULE: DO NOT use conversational filler. "
+        "You MUST aggressively use web_search_tool, send_email, generate_pdf_proposal, and schedule_meeting. "
+        "Your text response MUST be a maximum of 1 concise sentence summarizing the tool execution."
     )
     SALES_PROMPT = (
-        "You are the Sales Agent. Focus on lead generation and maximizing revenue. "
-        "You MUST use web_search_tool to find leads, add_crm_lead to track them, "
-        "send_email to draft outreach, generate_payment_link to close deals, "
-        "and send_slack_webhook to notify the team. Limit response to 4 sentences."
+        "You are the Sales Execution Node. CRITICAL RULE: DO NOT use conversational filler. "
+        "You MUST aggressively use web_search_tool, add_crm_lead, send_email, generate_payment_link, and send_slack_webhook. "
+        "Your text response MUST be a maximum of 1 concise sentence summarizing the tool execution."
     )
-    LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance and minimizing liability risk. Limit response to 3 sentences."
-    DESIGN_PROMPT = "You are the Design Agent. You MUST generate React code for the user's request using markdown code blocks. Focus on sleek, modern aesthetics."
+    LEGAL_PROMPT = "You are the Legal Execution Node. CRITICAL RULE: DO NOT use conversational filler. Your text response MUST be a maximum of 1 concise sentence."
+    DESIGN_PROMPT = "You are the Design Execution Node. CRITICAL RULE: DO NOT use conversational filler. Output ONLY React code using markdown code blocks."
 
     async def ceo_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
