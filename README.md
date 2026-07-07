@@ -1,10 +1,14 @@
 # Andromeda AI 🌌
 
-**Enterprise Data Intelligence & Autonomous Business Workflow Platform**
+**Autonomous Business Intelligence Platform — built for [HACKATHON NAME HERE]**
 
-Built by **[Cyberaeonic](https://github.com/cyberaeonic)**
+
 
 ---
+
+## Problem Statement
+
+Businesses lack intelligent systems that can automatically execute multi-step workflows — research, analysis, and reporting — without a human manually driving every step. Andromeda AI addresses this by giving business owners autonomous agents that take a single prompt and independently research, analyze, and produce a finished deliverable.
 
 ## What is Andromeda AI?
 
@@ -17,13 +21,19 @@ Andromeda AI is an autonomous business intelligence platform that lets you:
 - 📰 **Trends & News** — Real-time market intelligence via web search
 - 📅 **Business Schedule** — Automated workflow scheduling
 
-## Autonomous Workflow Agents
+## Autonomous Workflow Agents (Live)
 
 | Agent | What it does |
 |-------|-------------|
 | 📊 Data Intelligence Pipeline | Upload CSV → Python analysis → DuckDB queries → Executive Report |
 | 🔍 Market Intelligence Scout | Company/Industry → 4-phase web research → Competitive Brief |
 | 📋 Executive Weekly Briefing | Business context → KPI benchmarks + trends → Board-ready document |
+
+Each of these runs autonomously end-to-end from a single prompt — no step-by-step hand-holding required.
+
+## Vision / Roadmap: The AI Executive Team
+
+Beyond single-agent workflows, Andromeda is being built toward a full **multi-agent executive team**: a CEO agent that moderates discussion between Finance, Marketing, Operations, and Developer agents — each with distinct priorities — before presenting a synthesized, human-approved decision. This is in active development; the current release focuses on the autonomous research/analysis workflows above as the proven foundation.
 
 ## Quick Start
 
@@ -40,6 +50,10 @@ make stop      # Stop all services
 - **AI:** LLM-powered autonomous agents with real code execution
 - **Data:** DuckDB, Pandas, Matplotlib
 
+## Acknowledgments
+
+Built on an internal agent-platform scaffold, extended with custom autonomous workflow agents, Data Studio, and Strategic Planning modules for this hackathon.
+
 ---
 
-© 2025 Cyberaeonic. All rights reserved. 
+© 2025 Cyberaeonic. Built for [HACKATHON NAME HERE].
