@@ -1,6 +1,6 @@
 # Andromeda AI 🌌
 
-**Autonomous Business Intelligence Platform — built for [HACKATHON NAME HERE]**
+**Autonomous Business Intelligence Platform — built for TakeOver Hackathon**
 
 
 
