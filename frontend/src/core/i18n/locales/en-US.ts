@@ -162,24 +162,23 @@ export const enUS: Translations = {
     goalFailed: "Goal command failed.",
     suggestions: [
       {
-        suggestion: "Write",
-        prompt: "Write a blog post about the latest trends on [topic]",
-        icon: PenLineIcon,
-      },
-      {
-        suggestion: "Research",
-        prompt:
-          "Conduct a deep dive research on [topic], and summarize the findings.",
+        suggestion: "Scry Agents",
+        prompt: "List all active homunculi (agents) currently operating within the system.",
         icon: MicroscopeIcon,
       },
       {
-        suggestion: "Collect",
-        prompt: "Collect data from [source] and create a report.",
+        suggestion: "Diagnostics",
+        prompt: "Run a full system diagnostic spell and report any anomalies in the magical network.",
         icon: ShapesIcon,
       },
       {
-        suggestion: "Learn",
-        prompt: "Learn about [topic] and create a tutorial.",
+        suggestion: "Lore Summary",
+        prompt: "Summarize the overarching Fable 5 Magical Golden Fantasy aesthetic and its core design pillars.",
+        icon: PenLineIcon,
+      },
+      {
+        suggestion: "Security Wards",
+        prompt: "Check the perimeter wards for any incoming anomalous data packets or breaches.",
         icon: GraduationCapIcon,
       },
     ],

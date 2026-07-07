@@ -20,21 +20,13 @@ token_budget:
   hard_stop_threshold: 1.0
 max_recursion_limit: 1000
 models:
-- name: deepseek-v4-flash-free
-  display_name: Other OpenAI-compatible / deepseek-v4-flash-free
+- name: openrouter
+  display_name: OpenRouter (Gemini 2.0 Flash Lite Free)
   use: langchain_openai:ChatOpenAI
-  model: deepseek-v4-flash-free
-  api_key: $OPENAI_API_KEY
-  base_url: https://opencode.ai/zen/v1
-  supports_thinking: true
-  when_thinking_enabled:
-    extra_body:
-      thinking:
-        type: enabled
-  when_thinking_disabled:
-    extra_body:
-      thinking:
-        type: disabled
+  model: google/gemini-2.0-flash-lite-preview-02-05:free
+  api_key: $OPENROUTER_API_KEY
+  base_url: https://openrouter.ai/api/v1
+
 tool_groups:
 - name: web
 - name: file:read
@@ -154,7 +146,7 @@ memory:
   - correction
   guaranteed_token_budget: 500
 agents_api:
-  enabled: false
+  enabled: true
 skill_evolution:
   enabled: false
   moderation_model_name: null
@@ -166,7 +158,7 @@ run_events:
   max_trace_content: 10240
   track_token_usage: true
 scheduler:
-  enabled: false
+  enabled: true
   poll_interval_seconds: 5
   lease_seconds: 120
   max_concurrent_runs: 3
