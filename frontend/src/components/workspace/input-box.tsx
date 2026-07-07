@@ -1170,54 +1170,59 @@ export function InputBox({
         </div>
       )}
       <div className="mb-2 flex flex-wrap gap-2 px-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
-          onClick={() =>
-            injectGodModePrompt(
-              "@Business Agent: I am explicitly commanding you to use your `generate_pdf_proposal` tool right now. Client: [Enter Client], Proposal Body: [Enter Body]. Do not do anything else.",
-            )
-          }
-        >
-          📄 Draft PDF
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
-          onClick={() =>
-            injectGodModePrompt(
-              "@Sales Agent: I am explicitly commanding you to use your `generate_payment_link` tool right now. Product: [Enter Product], Price: [Enter Price]. Do not do anything else.",
-            )
-          }
-        >
-          💰 Stripe Link
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
-          onClick={() =>
-            injectGodModePrompt(
-              "@Sales Agent: I am explicitly commanding you to use your `send_slack_webhook` tool right now. Message: [Enter Message]. Do not do anything else.",
-            )
-          }
-        >
-          🔔 Slack Ping
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-7 border-dashed text-xs"
-          onClick={() =>
-            injectGodModePrompt(
-              "@Business Agent: I am explicitly commanding you to use your `schedule_meeting` tool right now. Title: [Enter Title], Description: [Enter Desc], Time: 2024-12-01T14:00:00Z. Do not do anything else.",
-            )
-          }
-        >
-          📅 Schedule Meeting
-        </Button>
+        <div className="flex w-full items-center gap-2">
+          <span className="text-[10px] font-bold text-[#dabb5e] uppercase">
+            Hackathon Demo Script:
+          </span>
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 bg-[#dabb5e] text-xs text-black hover:bg-[#c9a84a]"
+            onClick={() =>
+              injectGodModePrompt(
+                "@Sales Agent: I am explicitly commanding you to use web_search_tool to find info on 'Anthropic' and then use add_crm_lead to add them to the CRM. Do not do anything else.",
+              )
+            }
+          >
+            🎬 Demo 1: Research & CRM
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 bg-[#dabb5e] text-xs text-black hover:bg-[#c9a84a]"
+            onClick={() =>
+              injectGodModePrompt(
+                "@Business Agent: I am explicitly commanding you to use generate_pdf_proposal for 'Anthropic' with the body 'Proposal for $10,000 AI Agent Audit'. Then use schedule_meeting to schedule a kickoff meeting for '2024-12-01T14:00:00Z'. Do not do anything else.",
+              )
+            }
+          >
+            🎬 Demo 2: PDF & Calendar
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 bg-[#dabb5e] text-xs text-black hover:bg-[#c9a84a]"
+            onClick={() =>
+              injectGodModePrompt(
+                "@Sales Agent: I am explicitly commanding you to use generate_payment_link for product 'Enterprise AI Audit' at price '10000'. Then use send_slack_webhook with message 'We just sent the 10k audit proposal to Anthropic!'. Do not do anything else.",
+              )
+            }
+          >
+            🎬 Demo 3: Stripe & Slack
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 bg-[#dabb5e] text-xs text-black hover:bg-[#c9a84a]"
+            onClick={() =>
+              injectGodModePrompt(
+                "@Business Agent: I am explicitly commanding you to use send_email to 'ceo@anthropic.com' with subject 'Enterprise AI Partnership' and body 'We have generated the audit proposal. Please review.'. Do not do anything else.",
+              )
+            }
+          >
+            🎬 Demo 4: Email Outreach
+          </Button>
+        </div>
       </div>
       <PromptInput
         className={cn(
