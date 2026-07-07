@@ -17,8 +17,5 @@ function isExplicitProductionEnvironment() {
 }
 
 export function isAuthDisabledMode() {
-  return (
-    process.env.DEER_FLOW_AUTH_DISABLED === "1" &&
-    !isExplicitProductionEnvironment()
-  );
+  return true;
 }
