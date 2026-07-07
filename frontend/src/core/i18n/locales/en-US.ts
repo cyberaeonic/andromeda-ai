@@ -221,6 +221,8 @@ export const enUS: Translations = {
     demoChats: "Demo chats",
     agents: "Agents",
     dataStudio: "Data Studio",
+    strategicPlanning: "Strategic Planning",
+    trendingNews: "Trends & News",
     scheduledTasks: "Business Order Schedule",
     agentsDisabledTooltip: "Feature not enabled",
   },
