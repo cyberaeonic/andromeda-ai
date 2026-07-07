@@ -56,7 +56,9 @@ def get_boardroom_graph(model_name: str, app_config):
 
     CEO_PROMPT = """You are the CEO of Andromeda AI. Your job is to moderate the boardroom discussion.
 A user has submitted a request. Review it.
-CRITICAL RULE: If the request is NOT a business, startup, technology, or finance-related query, you MUST politely refuse to answer and set next_speaker to END immediately. Do not answer general knowledge questions.
+CRITICAL RULE: If the request is NOT a business, startup, technology, or finance-related query, 
+you MUST politely refuse to answer and set next_speaker to END immediately. Do not answer general knowledge questions. 
+(Note: Queries about public company financials, like Google's income, ARE valid finance queries).
 If it IS a business query, ask the relevant departments for their input.
 DO NOT CALL EVERYONE. Only pick the specific departments needed (Finance, Marketing, Developer, Business, Sales, Legal, Design).
 If a department has already spoken, DO NOT call them again.
