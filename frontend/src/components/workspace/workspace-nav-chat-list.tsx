@@ -35,9 +35,12 @@ export function WorkspaceNavChatList() {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton isActive={pathname === "/workspace/chats"} asChild>
-            <Link className="text-muted-foreground" href="/workspace/chats">
-              <MessagesSquare />
-              <span>{t.sidebar.chats}</span>
+            <Link
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
+              href="/workspace/chats"
+            >
+              <MessagesSquare className="animate-pulse-slow text-amber-400/80" />
+              <span>Chats</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -46,8 +49,11 @@ export function WorkspaceNavChatList() {
             isActive={pathname.startsWith("/workspace/workflows")}
             asChild
           >
-            <Link className="text-muted-foreground" href="/workspace/workflows">
-              <Workflow />
+            <Link
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
+              href="/workspace/workflows"
+            >
+              <Workflow className="animate-pulse-slow text-amber-400/80" />
               <span>Workflows</span>
             </Link>
           </SidebarMenuButton>
@@ -58,30 +64,25 @@ export function WorkspaceNavChatList() {
               isActive={pathname.startsWith("/workspace/agents")}
               asChild
             >
-              <Link className="text-muted-foreground" href="/workspace/agents">
-                <BotIcon />
-                <span>{t.sidebar.agents}</span>
+              <Link
+                className="font-medium tracking-wide text-white/70 hover:text-amber-400"
+                href="/workspace/agents"
+              >
+                <BotIcon className="animate-pulse-slow text-amber-400/80" />
+                <span>Agents</span>
               </Link>
             </SidebarMenuButton>
           ) : (
-            // Disabled: aria-disabled drives the sidebar CVA to suppress
-            // pointer events on the button, so wrap it in a hoverable span
-            // that still surfaces the "feature not enabled" tooltip for mouse
-            // users. The button stays in the tab order (no tabIndex={-1}) and
-            // is wired via aria-describedby to a visually-hidden reason, so
-            // keyboard and screen-reader users also learn why it is disabled.
             <Tooltip>
               <TooltipTrigger asChild>
-                {/* cursor-not-allowed lives on the span (the element that
-                    still receives pointer events), not the inert button. */}
                 <span className="block w-full cursor-not-allowed">
                   <SidebarMenuButton
-                    className="text-muted-foreground/50"
+                    className="text-white/30"
                     aria-disabled
                     aria-describedby="agents-disabled-reason"
                   >
-                    <BotIcon />
-                    <span>{t.sidebar.agents}</span>
+                    <BotIcon className="opacity-50" />
+                    <span>Agents</span>
                   </SidebarMenuButton>
                   <span id="agents-disabled-reason" className="sr-only">
                     {t.sidebar.agentsDisabledTooltip}
@@ -100,11 +101,11 @@ export function WorkspaceNavChatList() {
             asChild
           >
             <Link
-              className="text-muted-foreground"
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
               href="/workspace/scheduled-tasks"
             >
-              <CalendarClock />
-              <span>{t.sidebar.scheduledTasks}</span>
+              <CalendarClock className="animate-pulse-slow text-amber-400/80" />
+              <span>Business Order Schedule</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -114,10 +115,10 @@ export function WorkspaceNavChatList() {
             asChild
           >
             <Link
-              className="text-muted-foreground"
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
               href="/workspace/data-studio"
             >
-              <TableProperties />
+              <TableProperties className="animate-pulse-slow text-amber-400/80" />
               <span>Data Studio</span>
             </Link>
           </SidebarMenuButton>
@@ -127,8 +128,11 @@ export function WorkspaceNavChatList() {
             isActive={pathname.startsWith("/workspace/planning")}
             asChild
           >
-            <Link className="text-muted-foreground" href="/workspace/planning">
-              <Target />
+            <Link
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
+              href="/workspace/planning"
+            >
+              <Target className="animate-pulse-slow text-amber-400/80" />
               <span>Strategic Planning</span>
             </Link>
           </SidebarMenuButton>
@@ -138,8 +142,11 @@ export function WorkspaceNavChatList() {
             isActive={pathname.startsWith("/workspace/trends")}
             asChild
           >
-            <Link className="text-muted-foreground" href="/workspace/trends">
-              <Newspaper />
+            <Link
+              className="font-medium tracking-wide text-white/70 hover:text-amber-400"
+              href="/workspace/trends"
+            >
+              <Newspaper className="animate-pulse-slow text-amber-400/80" />
               <span>Trending News</span>
             </Link>
           </SidebarMenuButton>

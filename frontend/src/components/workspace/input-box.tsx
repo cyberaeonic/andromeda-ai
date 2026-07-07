@@ -1157,7 +1157,7 @@ export function InputBox({
       )}
       <PromptInput
         className={cn(
-          "bg-background/85 rounded-2xl backdrop-blur-sm transition-all duration-300 ease-out *:data-[slot='input-group']:rounded-2xl",
+          "bg-surface-container-lowest/80 border-primary/30 focus-within:border-primary/60 rounded-xl border shadow-[0_0_20px_rgba(212,160,23,0.1)] backdrop-blur-2xl transition-all duration-300 ease-out focus-within:shadow-[0_0_25px_rgba(212,160,23,0.3)] *:data-[slot='input-group']:rounded-xl",
           className,
         )}
         disabled={disabled}

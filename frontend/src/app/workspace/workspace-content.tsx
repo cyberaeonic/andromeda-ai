@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { Toaster } from "sonner";
 
 import { QueryClientProvider } from "@/components/query-client-provider";
-import { MilkyWayBackground } from "@/components/ui/milky-way-background";
+import { FableShaderBackground } from "@/components/ui/FableShaderBackground";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { CommandPalette } from "@/components/workspace/command-palette";
 import { GatewayOfflineBanner } from "@/components/workspace/gateway-offline-banner";
@@ -30,13 +30,13 @@ export async function WorkspaceContent({
 
   return (
     <QueryClientProvider>
-      {/* Milky Way starfield — fixed behind everything */}
-      <MilkyWayBackground />
+      {/* Fable magical shader fireflies — fixed behind everything */}
+      <FableShaderBackground />
       <SidebarProvider
         className="relative z-10 h-screen bg-transparent"
         defaultOpen={initialSidebarOpen}
       >
-        <WorkspaceSidebar className="border-r border-white/[0.06] bg-black/20 backdrop-blur-xl" />
+        <WorkspaceSidebar className="border-r border-amber-500/15 bg-black/35 shadow-[4px_0_24px_rgba(212,160,23,0.03)] backdrop-blur-2xl" />
         <SidebarInset className="min-w-0 bg-transparent">
           <GatewayOfflineBanner gatewayUnavailable={gatewayUnavailable} />
           {children}

@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -32,41 +33,65 @@ export function Welcome({
     if (isUltra) {
       return ["#efefbb", "#e9c665", "#e3a812"];
     }
-    return ["var(--color-foreground)"];
+    return ["#fde68a", "#fbbf24", "#f59e0b"];
   }, [isUltra]);
   useEffect(() => {
     waved = true;
   }, []);
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "mx-auto flex w-full max-w-full flex-col items-center justify-center gap-2 px-4 py-4 text-center sm:px-8",
+        "mx-auto flex w-full max-w-full flex-col items-center justify-center gap-3 px-4 py-4 text-center sm:px-8",
         className,
       )}
     >
       <div className="max-w-full text-2xl font-bold">
         {searchParams.get("mode") === "skill" ? (
-          `✨ ${t.welcome.createYourOwnSkill} ✨`
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {`✨ ${t.welcome.createYourOwnSkill} ✨`}
+          </motion.span>
         ) : (
           <div className="flex max-w-full flex-wrap items-center justify-center gap-2">
-            <div className={cn("inline-block", !waved ? "animate-wave" : "")}>
-              {isUltra ? "🚀" : "👋"}
-            </div>
+            <motion.div
+              className={cn("inline-block", !waved ? "animate-wave" : "")}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
+            >
+              {isUltra ? "🚀" : "✦"}
+            </motion.div>
             <AuroraText colors={colors}>{t.welcome.greeting}</AuroraText>
           </div>
         )}
       </div>
       {searchParams.get("mode") === "skill" ? (
-        <div className="text-muted-foreground max-w-full text-sm">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-muted-foreground max-w-full text-sm"
+        >
           <WelcomeDescription>
             {t.welcome.createYourOwnSkillDescription}
           </WelcomeDescription>
-        </div>
+        </motion.div>
       ) : (
-        <div className="text-muted-foreground max-w-full text-sm">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="max-w-full text-sm text-white/50"
+        >
           <WelcomeDescription>{t.welcome.description}</WelcomeDescription>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
