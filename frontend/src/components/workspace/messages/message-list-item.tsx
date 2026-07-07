@@ -326,7 +326,7 @@ function MessageContent_({
   // Uploading state: mock AI message shown while files upload
   if (message.additional_kwargs?.element === "task") {
     return (
-      <AIElementMessageContent className={className}>
+      <AIElementMessageContent className={className} agentName={message.name}>
         <Task defaultOpen={false}>
           <TaskTrigger title="">
             <div className="text-muted-foreground flex w-full cursor-default items-center gap-2 text-sm select-none">
@@ -342,7 +342,7 @@ function MessageContent_({
   // Reasoning-only AI message (no main response content yet)
   if (!isHuman && reasoningContent && !rawContent) {
     return (
-      <AIElementMessageContent className={className}>
+      <AIElementMessageContent className={className} agentName={message.name}>
         <Reasoning
           isStreaming={isLoading}
           startTimeProp={turnStartTime}
@@ -377,7 +377,10 @@ function MessageContent_({
         )}
         {filesList}
         {contentToDisplay && (
-          <AIElementMessageContent className="w-full max-w-full">
+          <AIElementMessageContent
+            className="w-full max-w-full"
+            agentName={message.name}
+          >
             <div className="break-words whitespace-pre-wrap">
               {contentToDisplay}
             </div>
@@ -388,7 +391,7 @@ function MessageContent_({
   }
 
   return (
-    <AIElementMessageContent className={className}>
+    <AIElementMessageContent className={className} agentName={message.name}>
       {filesList}
       {!isHuman &&
         (!!reasoningContent || wasLoading || turnDuration !== undefined) && (

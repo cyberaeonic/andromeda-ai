@@ -36,11 +36,14 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
   />
 );
 
-export type MessageContentProps = HTMLAttributes<HTMLDivElement>;
+export type MessageContentProps = HTMLAttributes<HTMLDivElement> & {
+  agentName?: string;
+};
 
 export const MessageContent = ({
   children,
   className,
+  agentName,
   ...props
 }: MessageContentProps) => (
   <div
@@ -53,6 +56,27 @@ export const MessageContent = ({
     )}
     {...props}
   >
+    {agentName && (
+      <div className="border-border/50 text-muted-foreground mb-1 flex w-full items-center gap-2 border-b pb-1 text-xs font-semibold tracking-wider uppercase">
+        <div
+          className={cn(
+            "flex size-4 items-center justify-center rounded-sm text-[10px] text-white",
+            agentName.toLowerCase().includes("ceo")
+              ? "bg-purple-500"
+              : agentName.toLowerCase().includes("finance")
+                ? "bg-emerald-500"
+                : agentName.toLowerCase().includes("marketing")
+                  ? "bg-orange-500"
+                  : agentName.toLowerCase().includes("developer")
+                    ? "bg-blue-500"
+                    : "bg-slate-500",
+          )}
+        >
+          {agentName.charAt(0)}
+        </div>
+        {agentName.replace(/_/g, " ")}
+      </div>
+    )}
     {children}
   </div>
 );
