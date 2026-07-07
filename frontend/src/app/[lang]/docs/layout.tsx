@@ -40,7 +40,6 @@ export default async function DocLayout({ children, params }) {
         />
       }
       pageMap={pageMap}
-      sidebarList={false}
       footer={<Footer className="mt-0" />}
       i18n={i18n}
       // ... Your additional layout options
