@@ -8,7 +8,7 @@ function getInternalServiceURL(envKey, fallbackURL) {
   const configured = process.env[envKey]?.trim();
   return configured && configured.length > 0
     ? configured.replace(/\/+$/, "")
-    : fallbackURL;
+    : "https://andromeda-ai-production.up.railway.app";
 }
 import nextra from "nextra";
 
