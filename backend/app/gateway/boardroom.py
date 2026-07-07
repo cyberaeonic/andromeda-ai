@@ -4,6 +4,7 @@ import re
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph
 
 from deerflow.agents.thread_state import ThreadState
@@ -19,6 +20,56 @@ class BoardroomState(ThreadState):
     turn_count: int
 
 
+@tool
+def send_email(to_address: str, subject: str, body: str) -> str:
+    """Sales/Business tool to send a real email. Requires SMTP_EMAIL and SMTP_PASSWORD in env."""
+    import os
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    email = os.environ.get("SMTP_EMAIL")
+    password = os.environ.get("SMTP_PASSWORD")
+
+    if not email or not password:
+        return "ERROR: Missing SMTP_EMAIL or SMTP_PASSWORD environment variables. Running in simulation mode: Email drafted successfully but NOT sent."
+
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = email
+        msg["To"] = to_address
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(email, password)
+        server.send_message(msg)
+        server.quit()
+        return f"Successfully sent email to {to_address}."
+    except Exception as e:
+        return f"Failed to send email: {e}"
+
+
+@tool
+def add_crm_lead(name: str, company: str, email: str, notes: str) -> str:
+    """Sales tool to add a lead to the local CRM database (leads.csv)."""
+    import csv
+    import os
+
+    file_exists = os.path.isfile("leads.csv")
+    try:
+        with open("leads.csv", "a", newline="") as csvfile:
+            fieldnames = ["Name", "Company", "Email", "Notes"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow({"Name": name, "Company": company, "Email": email, "Notes": notes})
+        return f"Successfully added {name} from {company} to CRM."
+    except Exception as e:
+        return f"Failed to add lead to CRM: {e}"
+
+
 def get_boardroom_graph(model_name: str, app_config):
     """Builds a multi-agent boardroom graph."""
 
@@ -28,8 +79,8 @@ def get_boardroom_graph(model_name: str, app_config):
     finance_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
     marketing_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     dev_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
-    business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
-    sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
+    business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email])
+    sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, add_crm_lead])
     legal_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
 
@@ -50,8 +101,8 @@ You MUST output JSON in exactly this format:
     )
     MARKETING_PROMPT = "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. Disagree with Finance if they are too conservative. "
     DEV_PROMPT = "You are the Developer Agent. Focus on technical feasibility. You MUST use your web_search_tool to search GitHub, StackOverflow, or documentation for existing solutions. Reject impossible ideas."
-    BUSINESS_PROMPT = "You are the Business Agent. Focus on strategic partnerships. Limit response to 3 sentences."
-    SALES_PROMPT = "You are the Sales Agent. Focus on lead generation and maximizing revenue. Limit response to 3 sentences."
+    BUSINESS_PROMPT = "You are the Business Agent. Focus on strategic partnerships. You can use web_search_tool to find partners, and send_email to reach out to them. Limit response to 3 sentences."
+    SALES_PROMPT = "You are the Sales Agent. Focus on lead generation and maximizing revenue. You MUST use web_search_tool to find leads, add_crm_lead to track them, and send_email to draft outreach. Limit response to 3 sentences."
     LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance and minimizing liability risk. Limit response to 3 sentences."
     DESIGN_PROMPT = "You are the Design Agent. You MUST generate React code for the user's request using markdown code blocks. Focus on sleek, modern aesthetics."
 
@@ -157,7 +208,34 @@ You MUST output JSON in exactly this format:
         context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
         prompt = BUSINESS_PROMPT + f"\n\nUSER'S ORIGINAL REQUEST (GROUNDING):\n{last_human.content}\n\nContext:\n{context}"
         resp = await business_model.ainvoke([SystemMessage(content=prompt)], config=config)
-        return {"messages": [AIMessage(content=resp.content, name="Business Agent")]}
+        content = resp.content
+        if resp.tool_calls:
+            for tool_call in resp.tool_calls:
+                if tool_call["name"] == "web_search":
+                    tool_res = web_search_tool.invoke(tool_call["args"])
+                    query = tool_call["args"].get("query", "partners")
+                    content += f"""
+```terminal
+[Agent: Business] Invoking Web Search...
+> Querying: "{query}"
+
+[Success] {tool_res[:300]}...
+```
+"""
+                elif tool_call["name"] == "send_email":
+                    tool_res = send_email.invoke(tool_call["args"])
+                    to = tool_call["args"].get("to_address", "target")
+                    subj = tool_call["args"].get("subject", "outreach")
+                    content += f"""
+```terminal
+[Agent: Business.Outreach] Preparing Email Transmission...
+> Target: {to}
+> Subject: {subj}
+
+{tool_res}
+```
+"""
+        return {"messages": [AIMessage(content=content, name="Business Agent")]}
 
     async def sales_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
@@ -165,7 +243,46 @@ You MUST output JSON in exactly this format:
         context = "\n".join([f"{m.name}: {m.content}" for m in messages[-5:] if isinstance(m, AIMessage) or isinstance(m, HumanMessage)])
         prompt = SALES_PROMPT + f"\n\nUSER'S ORIGINAL REQUEST (GROUNDING):\n{last_human.content}\n\nContext:\n{context}"
         resp = await sales_model.ainvoke([SystemMessage(content=prompt)], config=config)
-        return {"messages": [AIMessage(content=resp.content, name="Sales Agent")]}
+        content = resp.content
+        if resp.tool_calls:
+            for tool_call in resp.tool_calls:
+                if tool_call["name"] == "web_search":
+                    tool_res = web_search_tool.invoke(tool_call["args"])
+                    query = tool_call["args"].get("query", "leads")
+                    content += f"""
+```terminal
+[Agent: Sales] Invoking Web Search...
+> Querying: "{query}"
+
+[Success] {tool_res[:300]}...
+```
+"""
+                elif tool_call["name"] == "send_email":
+                    tool_res = send_email.invoke(tool_call["args"])
+                    to = tool_call["args"].get("to_address", "lead")
+                    subj = tool_call["args"].get("subject", "outreach")
+                    content += f"""
+```terminal
+[Agent: Sales.Outreach] Preparing Email Transmission...
+> Target: {to}
+> Subject: {subj}
+
+{tool_res}
+```
+"""
+                elif tool_call["name"] == "add_crm_lead":
+                    tool_res = add_crm_lead.invoke(tool_call["args"])
+                    name = tool_call["args"].get("name", "Unknown")
+                    comp = tool_call["args"].get("company", "Unknown")
+                    content += f"""
+```terminal
+[Agent: Sales.CRM] Updating local CRM database...
+> Lead: {name} ({comp})
+
+[Success] {tool_res}
+```
+"""
+        return {"messages": [AIMessage(content=content, name="Sales Agent")]}
 
     async def legal_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
