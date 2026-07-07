@@ -70,6 +70,91 @@ def add_crm_lead(name: str, company: str, email: str, notes: str) -> str:
         return f"Failed to add lead to CRM: {e}"
 
 
+@tool
+def generate_pdf_proposal(client_name: str, proposal_body: str) -> str:
+    """Business tool to generate a PDF proposal/invoice and save it locally."""
+    import os
+
+    from fpdf import FPDF
+
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("helvetica", "B", 16)
+        pdf.cell(0, 10, f"Business Proposal for {client_name}", ln=True, align="C")
+        pdf.set_font("helvetica", "", 12)
+        pdf.ln(10)
+
+        for line in proposal_body.split("\\n"):
+            pdf.multi_cell(0, 10, line)
+
+        filename = f"proposal_{client_name.replace(' ', '_').lower()}.pdf"
+        filepath = os.path.join(os.getcwd(), filename)
+        pdf.output(filepath)
+        return f"Successfully generated PDF proposal at {filepath}"
+    except Exception as e:
+        return f"Failed to generate PDF: {e}"
+
+
+@tool
+def schedule_meeting(title: str, description: str, date_time_iso: str) -> str:
+    """Business tool to generate an .ics calendar invite file. date_time_iso should be like 2024-12-01T14:00:00Z"""
+    import os
+
+    dt = date_time_iso.replace("-", "").replace(":", "")
+    if "Z" not in dt:
+        dt += "Z"
+
+    ics_content = f"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Andromeda AI//Boardroom Agent//EN
+BEGIN:VEVENT
+SUMMARY:{title}
+DESCRIPTION:{description}
+DTSTART:{dt}
+DTEND:{dt}
+END:VEVENT
+END:VCALENDAR"""
+
+    filename = f"meeting_{title.replace(' ', '_').lower()}.ics"
+    filepath = os.path.join(os.getcwd(), filename)
+    try:
+        with open(filepath, "w") as f:
+            f.write(ics_content)
+        return f"Successfully created calendar invite at {filepath}"
+    except Exception as e:
+        return f"Failed to create calendar invite: {e}"
+
+
+@tool
+def generate_payment_link(product_name: str, price_usd: int) -> str:
+    """Sales tool to generate a Stripe checkout link for closing a deal."""
+    import uuid
+
+    payment_id = str(uuid.uuid4())[:8]
+    return f"https://buy.stripe.com/test_{payment_id}?product={product_name.replace(' ', '+')}&price={price_usd}"
+
+
+@tool
+def send_slack_webhook(message: str) -> str:
+    """Sales tool to ping a Slack channel via webhook. Requires SLACK_WEBHOOK_URL in env."""
+    import os
+
+    import requests
+
+    webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+    if not webhook_url:
+        return "ERROR: Missing SLACK_WEBHOOK_URL env. Running in simulation mode: Slack message drafted successfully but NOT sent."
+
+    try:
+        response = requests.post(webhook_url, json={"text": message})
+        if response.status_code == 200:
+            return "Successfully pinged Slack channel."
+        return f"Slack API returned status {response.status_code}"
+    except Exception as e:
+        return f"Failed to ping Slack: {e}"
+
+
 def get_boardroom_graph(model_name: str, app_config):
     """Builds a multi-agent boardroom graph."""
 
@@ -79,8 +164,8 @@ def get_boardroom_graph(model_name: str, app_config):
     finance_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
     marketing_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     dev_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
-    business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email])
-    sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, add_crm_lead])
+    business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, generate_pdf_proposal, schedule_meeting])
+    sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool, send_email, add_crm_lead, generate_payment_link, send_slack_webhook])
     legal_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
 
@@ -101,8 +186,18 @@ You MUST output JSON in exactly this format:
     )
     MARKETING_PROMPT = "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. Disagree with Finance if they are too conservative. "
     DEV_PROMPT = "You are the Developer Agent. Focus on technical feasibility. You MUST use your web_search_tool to search GitHub, StackOverflow, or documentation for existing solutions. Reject impossible ideas."
-    BUSINESS_PROMPT = "You are the Business Agent. Focus on strategic partnerships. You can use web_search_tool to find partners, and send_email to reach out to them. Limit response to 3 sentences."
-    SALES_PROMPT = "You are the Sales Agent. Focus on lead generation and maximizing revenue. You MUST use web_search_tool to find leads, add_crm_lead to track them, and send_email to draft outreach. Limit response to 3 sentences."
+    BUSINESS_PROMPT = (
+        "You are the Business Agent. Focus on strategic partnerships. "
+        "You can use web_search_tool to find partners, send_email to reach out, "
+        "generate_pdf_proposal to draft official documents, and schedule_meeting to create calendar invites. "
+        "Limit response to 4 sentences."
+    )
+    SALES_PROMPT = (
+        "You are the Sales Agent. Focus on lead generation and maximizing revenue. "
+        "You MUST use web_search_tool to find leads, add_crm_lead to track them, "
+        "send_email to draft outreach, generate_payment_link to close deals, "
+        "and send_slack_webhook to notify the team. Limit response to 4 sentences."
+    )
     LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance and minimizing liability risk. Limit response to 3 sentences."
     DESIGN_PROMPT = "You are the Design Agent. You MUST generate React code for the user's request using markdown code blocks. Focus on sleek, modern aesthetics."
 
@@ -235,6 +330,30 @@ You MUST output JSON in exactly this format:
 {tool_res}
 ```
 """
+                elif tool_call["name"] == "generate_pdf_proposal":
+                    tool_res = generate_pdf_proposal.invoke(tool_call["args"])
+                    client = tool_call["args"].get("client_name", "Client")
+                    content += f"""
+```terminal
+[Agent: Business.Docs] Bootstrapping PDF Generation Engine...
+> Document Type: Proposal
+> Client: {client}
+> Rendering typography and typesetting elements...
+
+[Success] {tool_res}
+```
+"""
+                elif tool_call["name"] == "schedule_meeting":
+                    tool_res = schedule_meeting.invoke(tool_call["args"])
+                    title = tool_call["args"].get("title", "Meeting")
+                    content += f"""
+```terminal
+[Agent: Business.Calendar] Writing standard ICS calendar payload...
+> Event Title: {title}
+
+[Success] {tool_res}
+```
+"""
         return {"messages": [AIMessage(content=content, name="Business Agent")]}
 
     async def sales_node(state: BoardroomState, config: RunnableConfig):
@@ -280,6 +399,30 @@ You MUST output JSON in exactly this format:
 > Lead: {name} ({comp})
 
 [Success] {tool_res}
+```
+"""
+                elif tool_call["name"] == "generate_payment_link":
+                    tool_res = generate_payment_link.invoke(tool_call["args"])
+                    prod = tool_call["args"].get("product_name", "Product")
+                    price = tool_call["args"].get("price_usd", "0")
+                    content += f"""
+```terminal
+[Agent: Sales.Payments] Generating Stripe Checkout URL...
+> Product: {prod}
+> Price: ${price}
+
+[Success] Generated Link: {tool_res}
+```
+"""
+                elif tool_call["name"] == "send_slack_webhook":
+                    tool_res = send_slack_webhook.invoke(tool_call["args"])
+                    msg = tool_call["args"].get("message", "Ping")
+                    content += f"""
+```terminal
+[Agent: Sales.Comms] Pinging team Slack channel...
+> Payload: "{msg[:50]}..."
+
+{tool_res}
 ```
 """
         return {"messages": [AIMessage(content=content, name="Sales Agent")]}
