@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import Galaxy from "@/components/ui/galaxy";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/core/auth/AuthProvider";
 import {
@@ -193,23 +194,24 @@ export default function LoginPage() {
     }
   };
 
-
   return (
     <div
       className="relative flex min-h-screen items-center justify-center overflow-x-hidden overflow-y-auto"
       style={{ backgroundColor: "#080818" }}
     >
-      {/* Galaxy background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url(/images/andromeda-bg.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          opacity: 0.85,
-        }}
-      />
+      {/* Animated Galaxy Background (Orange/Light Orange Theme) */}
+      <div className="absolute inset-0 z-0 bg-black">
+        <Galaxy
+          hueShift={15}
+          saturation={0.8}
+          speed={0.3}
+          starSpeed={0.2}
+          glowIntensity={0.4}
+          rotationSpeed={0.05}
+          twinkleIntensity={0.2}
+          transparent={true}
+        />
+      </div>
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 z-0 bg-black/40" />
       <div className="relative z-10 w-full max-w-md space-y-6 rounded-3xl border border-white/10 bg-black/50 p-8 shadow-2xl backdrop-blur-md">
