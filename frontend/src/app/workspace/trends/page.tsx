@@ -14,8 +14,8 @@ export default function TrendsPage() {
   const { t } = useI18n();
 
   useEffect(() => {
-    document.title = `${t.sidebar.trendingNews} - ${t.pages.appName}`;
-  }, [t.sidebar.trendingNews, t.pages.appName]);
+    document.title = `Trending News - ${t.pages.appName}`;
+  }, [t.pages.appName]);
 
   return (
     <WorkspaceContainer>

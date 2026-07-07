@@ -14,8 +14,8 @@ export default function DataStudioPage() {
   const { t } = useI18n();
 
   useEffect(() => {
-    document.title = `${t.sidebar.dataStudio} - ${t.pages.appName}`;
-  }, [t.sidebar.dataStudio, t.pages.appName]);
+    document.title = `Data Studio - ${t.pages.appName}`;
+  }, [t.pages.appName]);
 
   return (
     <WorkspaceContainer>

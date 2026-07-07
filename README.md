@@ -42,4 +42,4 @@ make stop      # Stop all services
 
 ---
 
-© 2025 Cyberaeonic. All rights reserved.
+© 2025 Cyberaeonic. All rights reserved. 

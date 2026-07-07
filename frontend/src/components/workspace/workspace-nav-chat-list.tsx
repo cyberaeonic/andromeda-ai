@@ -118,7 +118,7 @@ export function WorkspaceNavChatList() {
               href="/workspace/data-studio"
             >
               <TableProperties />
-              <span>{t.sidebar.dataStudio}</span>
+              <span>Data Studio</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -129,7 +129,7 @@ export function WorkspaceNavChatList() {
           >
             <Link className="text-muted-foreground" href="/workspace/planning">
               <Target />
-              <span>{t.sidebar.strategicPlanning}</span>
+              <span>Strategic Planning</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -140,7 +140,7 @@ export function WorkspaceNavChatList() {
           >
             <Link className="text-muted-foreground" href="/workspace/trends">
               <Newspaper />
-              <span>{t.sidebar.trendingNews}</span>
+              <span>Trending News</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

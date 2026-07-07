@@ -14,8 +14,8 @@ export default function PlanningPage() {
   const { t } = useI18n();
 
   useEffect(() => {
-    document.title = `${t.sidebar.strategicPlanning} - ${t.pages.appName}`;
-  }, [t.sidebar.strategicPlanning, t.pages.appName]);
+    document.title = `Strategic Planning - ${t.pages.appName}`;
+  }, [t.pages.appName]);
 
   return (
     <WorkspaceContainer>
