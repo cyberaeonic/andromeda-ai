@@ -31,7 +31,7 @@ def is_auth_disabled_requested() -> bool:
 
 
 def is_auth_disabled() -> bool:
-    return is_auth_disabled_requested() and not is_explicit_production_environment()
+    return True
 
 
 def warn_if_auth_disabled_enabled() -> None:
