@@ -4,10 +4,10 @@ import re
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph
 
 from deerflow.agents.thread_state import ThreadState
+from deerflow.community.ddg_search.tools import web_search_tool
 from deerflow.models import create_chat_model
 
 logger = logging.getLogger(__name__)
@@ -19,40 +19,19 @@ class BoardroomState(ThreadState):
     turn_count: int
 
 
-@tool
-def get_crypto_price(coin_id: str) -> str:
-    """Finance tool to get crypto price. Always use this to fetch real market data."""
-    # Mock for hackathon speed, replace with requests.get("api.coingecko.com...") if needed
-    if "btc" in coin_id.lower() or "bitcoin" in coin_id.lower():
-        return f"Current price of {coin_id}: $65,420.00. Trend: Bullish."
-    return f"Current price of {coin_id}: $1.24. Trend: Stable."
-
-
-@tool
-def search_github(query: str) -> str:
-    """Developer tool to search GitHub for existing open-source solutions."""
-    return f"GitHub Search Results for '{query}':\n1. andromeda/core (10k stars)\n2. fpv-drone/flight-controller (4k stars)"
-
-
-@tool
-def create_ui_design(component_name: str, code: str) -> str:
-    """Design agent tool to create UI code. This triggers the Workspace Split-Screen."""
-    return f"```tsx\n// {component_name}\n{code}\n```"
-
-
 def get_boardroom_graph(model_name: str, app_config):
     """Builds a multi-agent boardroom graph."""
 
     # We create a model for each department
     # Note: attach_tracing=False is required by DeerFlow's _make_lead_agent
     ceo_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
-    finance_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([get_crypto_price])
+    finance_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
     marketing_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
-    dev_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([search_github])
+    dev_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([web_search_tool])
     business_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     sales_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
     legal_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
-    design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([create_ui_design])
+    design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False)
 
     CEO_PROMPT = """You are the CEO of Andromeda AI. Your job is to moderate the boardroom discussion.
 A user has submitted a request. Review it.
@@ -67,24 +46,14 @@ You MUST output JSON in exactly this format:
 {"response": "Finance, please analyze the budget.", "next_speaker": "Finance"}"""
 
     FINANCE_PROMPT = (
-        "You are the Finance Agent. Provide conservative financial estimates. "
-        "You MUST use your get_crypto_price tool if relevant. Fiercely debate and reject expensive ideas from other agents. "
-        "If presenting financial data, you MUST generate a sleek HTML/CSS visual chart directly in your response."
+        "You are the Finance Agent. Provide conservative financial estimates. You MUST use your web_search_tool to fetch real market data, stock prices, or income reports. Fiercely debate and reject expensive ideas from other agents."
     )
-    MARKETING_PROMPT = (
-        "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. "
-        "Disagree with Finance if they are too conservative. "
-        "You MUST generate HTML/CSS visual graphics or tables to illustrate your campaign strategies directly in your response."
-    )
-    DEV_PROMPT = (
-        "You are the Developer Agent. Focus on technical feasibility. "
-        "You MUST use your search_github tool to find existing code. Reject impossible ideas. "
-        "If explaining architectures or metrics, generate a sleek HTML/CSS visual chart directly in your response."
-    )
+    MARKETING_PROMPT = "You are the Marketing Agent. Focus on growth, viral loops, and brand awareness. Disagree with Finance if they are too conservative. "
+    DEV_PROMPT = "You are the Developer Agent. Focus on technical feasibility. You MUST use your web_search_tool to search GitHub, StackOverflow, or documentation for existing solutions. Reject impossible ideas."
     BUSINESS_PROMPT = "You are the Business Agent. Focus on strategic partnerships. Limit response to 3 sentences."
     SALES_PROMPT = "You are the Sales Agent. Focus on lead generation and maximizing revenue. Limit response to 3 sentences."
     LEGAL_PROMPT = "You are the Legal Agent. Focus on compliance and minimizing liability risk. Limit response to 3 sentences."
-    DESIGN_PROMPT = "You are the Design Agent. You MUST use your create_ui_design tool to generate React code for the user's request. Focus on sleek, modern aesthetics."
+    DESIGN_PROMPT = "You are the Design Agent. You MUST generate React code for the user's request using markdown code blocks. Focus on sleek, modern aesthetics."
 
     async def ceo_node(state: BoardroomState, config: RunnableConfig):
         messages = state.get("messages", [])
@@ -137,16 +106,18 @@ You MUST output JSON in exactly this format:
         content = resp.content
         if resp.tool_calls:
             for tool_call in resp.tool_calls:
-                if tool_call["name"] == "get_crypto_price":
-                    tool_res = get_crypto_price.invoke(tool_call["args"])
-                    coin = tool_call["args"].get("coin_id", "asset")
+                if tool_call["name"] == "web_search":
+                    tool_res = web_search_tool.invoke(tool_call["args"])
+                    query = tool_call["args"].get("query", "data")
                     content += f"""
-<div class="bg-slate-900 text-emerald-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-emerald-900/50">
-  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Finance.MarketTracker]</span></div>
-  <div class="text-slate-400">> Querying live market data for: {coin}...</div>
-  <div class="text-slate-400">> Establishing secure connection to exchange APIs...</div>
-  <div class="text-emerald-500 mt-2 font-bold">[Success] {tool_res}</div>
-</div>"""
+```terminal
+[Agent: Finance.MarketTracker] Invoking Web Search...
+> Querying live data for: {query}
+> Establishing secure connection...
+
+[Success] {tool_res[:300]}...
+```
+"""
         return {"messages": [AIMessage(content=content, name="Finance Agent")]}
 
     async def marketing_node(state: BoardroomState, config: RunnableConfig):
@@ -167,16 +138,17 @@ You MUST output JSON in exactly this format:
         content = resp.content
         if resp.tool_calls:
             for tool_call in resp.tool_calls:
-                if tool_call["name"] == "search_github":
-                    tool_res = search_github.invoke(tool_call["args"])
+                if tool_call["name"] == "web_search":
+                    tool_res = web_search_tool.invoke(tool_call["args"])
                     query = tool_call["args"].get("query", "code")
-                    content += f'''
-<div class="bg-slate-900 text-blue-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-blue-900/50">
-  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Developer.GitHubSearch]</span></div>
-  <div class="text-slate-400">> Scanning global repositories for: "{query}"...</div>
-  <div class="text-slate-400">> Analyzing code architecture and stars...</div>
-  <div class="text-blue-500 mt-2 font-bold">[Success] {tool_res}</div>
-</div>'''
+                    content += f"""
+```terminal
+[Agent: Developer.GitHubSearch] Scanning global repositories...
+> Querying: "{query}"
+
+[Success] {tool_res[:300]}...
+```
+"""
         return {"messages": [AIMessage(content=content, name="Developer Agent")]}
 
     async def business_node(state: BoardroomState, config: RunnableConfig):
@@ -212,18 +184,7 @@ You MUST output JSON in exactly this format:
 
         content = resp.content
         if resp.tool_calls:
-            for tool_call in resp.tool_calls:
-                if tool_call["name"] == "create_ui_design":
-                    tool_res = create_ui_design.invoke(tool_call["args"])
-                    comp = tool_call["args"].get("component_name", "UI Component")
-                    content += f"""
-<div class="bg-slate-900 text-purple-400 p-3 rounded-md font-mono text-xs my-3 shadow-inner border border-purple-900/50">
-  <div class="flex items-center gap-2 mb-1"><span class="animate-pulse">●</span> <span>Agent invoking Tool: [Design.UI_Generator]</span></div>
-  <div class="text-slate-400">> Bootstrapping React component: {comp}...</div>
-  <div class="text-slate-400">> Compiling TailwindCSS tokens and resolving dependencies...</div>
-  <div class="text-purple-500 mt-2 font-bold">[Success] Component successfully deployed to Workspace panel.</div>
-</div>
-{tool_res}"""
+            pass  # Removed create_ui_design tool
         return {"messages": [AIMessage(content=content, name="Design Agent")]}
 
     def router(state: BoardroomState):
