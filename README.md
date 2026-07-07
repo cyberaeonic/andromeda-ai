@@ -31,9 +31,21 @@ Andromeda AI is an autonomous business intelligence platform that lets you:
 
 Each of these runs autonomously end-to-end from a single prompt — no step-by-step hand-holding required.
 
-## Vision / Roadmap: The AI Executive Team
+## 💼 The Boardroom: Multi-Agent Executive Team (Live!)
 
-Beyond single-agent workflows, Andromeda is being built toward a full **multi-agent executive team**: a CEO agent that moderates discussion between Finance, Marketing, Operations, and Developer agents — each with distinct priorities — before presenting a synthesized, human-approved decision. This is in active development; the current release focuses on the autonomous research/analysis workflows above as the proven foundation.
+The core feature of Andromeda AI is the **Boardroom**, where a CEO agent moderates a discussion between specialized AI executives (Finance, Sales, Marketing, Developer, etc.). We've armed these agents with **real business automation super-tools**:
+
+| Agent | Super-Tool | Hackathon-Ready Capability |
+|-------|------------|----------------------------|
+| 💰 **Sales** | `generate_payment_link` | Instantly generates Stripe checkout URLs to close deals |
+| 💰 **Sales** | `send_slack_webhook` | Pings the team Slack channel when a lead is captured |
+| 💰 **Sales** | `add_crm_lead` | Automatically records lead data (Name, Company) to a local CRM |
+| 👔 **Business** | `generate_pdf_proposal` | Typesets and saves real, downloadable PDF contracts/invoices |
+| 👔 **Business** | `schedule_meeting` | Generates `.ics` calendar invites for Google Calendar/Outlook |
+| 📈 **Finance** | `web_search_tool` | Scours the internet for live market data, stock prices, and income reports |
+| 📧 **Global** | `send_email` | Sends real SMTP outreach emails to prospects (with Safe Simulation mode) |
+
+All tools execute with beautiful **Native Markdown Terminal UI** blocks right in the chat console so you can watch your AI business run itself in real-time.
 
 ## Quick Start
 
