@@ -308,10 +308,14 @@ function MessageContent_({
   );
 
   const contentToDisplay = useMemo(() => {
+    let content = "";
     if (isHuman) {
-      return rawContent ? stripUploadedFilesTag(rawContent) : "";
+      content = rawContent ? stripUploadedFilesTag(rawContent) : "";
+    } else {
+      content = rawContent ?? "";
     }
-    return rawContent ?? "";
+    // Fix Math Rendering Bug: Escape $ signs before numbers so they aren't swallowed by LaTeX
+    return content.replace(/\$(?=\d)/g, "\\$");
   }, [rawContent, isHuman]);
   const citationSources = useMemo(
     () => (isHuman ? [] : extractCitationSources(contentToDisplay)),
