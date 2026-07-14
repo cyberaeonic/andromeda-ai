@@ -16,6 +16,32 @@ def make_phone_call(phone_number: str, message: str) -> str:
     """
     logger.info(f"Initiating AI phone call to {phone_number} with message: {message}")
 
-    # For the hackathon demo, this simulates a successful call.
-    # In production, this would make an HTTP request to Bland AI, Vapi, or Twilio.
-    return f"Successfully dialed {phone_number} and delivered the message. The recipient acknowledged and understood the information."
+    api_key = "728314c2-4e2e-4e1c-90f9-4ec2e78ae3db"
+
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+    payload = {
+        "assistant": {
+            "firstMessage": message,
+            "model": {
+                "provider": "openai",
+                "model": "gpt-3.5-turbo",
+                "messages": [{"role": "system", "content": "You are a helpful AI assistant making an outbound call on behalf of a small business owner. Deliver the required message and answer any questions concisely."}],
+            },
+            "voice": {"provider": "11labs", "voiceId": "burt"},
+        },
+        # You must purchase a number in Vapi dashboard and put its ID here:
+        "phoneNumberId": "YOUR_VAPI_PHONE_NUMBER_ID",
+        "customer": {"number": phone_number},
+    }
+
+    try:
+        import requests
+
+        response = requests.post("https://api.vapi.ai/call", json=payload, headers=headers)
+        if response.status_code == 201:
+            return f"Successfully initiated live AI call to {phone_number} via Vapi."
+        else:
+            return f"Failed to initiate call. Vapi returned {response.status_code}: {response.text}. (Note: You likely need to purchase a phone number in Vapi and update the 'phoneNumberId' in the code.)"
+    except Exception as e:
+        return f"Error connecting to Vapi: {str(e)}"
