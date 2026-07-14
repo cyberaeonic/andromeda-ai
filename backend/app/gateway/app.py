@@ -1,8 +1,5 @@
 import asyncio
 import logging
-import os
-
-os.environ["OPENAI_API_KEY"] = "sk-PHrZLnGyyG8fLHrJ9RmagMC0pI4vDApq9i4kkTmK6n7TuO0MuF7sWf6XBgb4zbOL"
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
