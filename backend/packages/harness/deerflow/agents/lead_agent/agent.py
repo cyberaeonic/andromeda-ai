@@ -601,22 +601,27 @@ def _make_lead_agent(config: RunnableConfig, *, app_config: AppConfig):
     if skill_setup.describe_skill_tool:
         final_tools.append(skill_setup.describe_skill_tool)
 
-    # HACKATHON OVERRIDE: Return the Boardroom Graph instead of the default agent
-    from app.gateway.boardroom import get_boardroom_graph
-
-    # We still build middlewares to get sandbox, token budgets, memory, etc.
-    _ = build_middlewares(
-        config,
-        model_name=model_name,
-        agent_name=agent_name,
-        available_skills=available_skills,
-        app_config=resolved_app_config,
-        deferred_setup=setup,
-        user_id=resolved_user_id,
+    return create_agent(
+        model=create_chat_model(name=model_name, thinking_enabled=thinking_enabled, reasoning_effort=reasoning_effort, app_config=resolved_app_config, attach_tracing=False),
+        tools=final_tools,
+        middleware=build_middlewares(
+            config,
+            model_name=model_name,
+            agent_name=agent_name,
+            available_skills=available_skills,
+            app_config=resolved_app_config,
+            deferred_setup=setup,
+            user_id=resolved_user_id,
+        ),
+        system_prompt=apply_prompt_template(
+            subagent_enabled=subagent_enabled,
+            max_concurrent_subagents=max_concurrent_subagents,
+            agent_name=agent_name,
+            available_skills=available_skills,
+            app_config=resolved_app_config,
+            deferred_names=setup.deferred_names,
+            user_id=resolved_user_id,
+            skill_names=skill_setup.skill_names or None,
+        ),
+        state_schema=ThreadState,
     )
-
-    boardroom = get_boardroom_graph(model_name, resolved_app_config)
-    # LangChain create_agent normally adds ThreadDataMiddleware and others
-    # For the hackathon demo, returning the bare CompiledStateGraph works if we
-    # don't strictly rely on those middlewares for core flow.
-    return boardroom
