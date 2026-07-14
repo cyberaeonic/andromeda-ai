@@ -15,8 +15,11 @@ def make_phone_call(phone_number: str, message: str) -> str:
         message: The message the AI should deliver when the user answers.
     """
     logger.info(f"Initiating AI phone call to {phone_number} with message: {message}")
+    import os
 
-    api_key = "728314c2-4e2e-4e1c-90f9-4ec2e78ae3db"
+    api_key = os.getenv("VAPI_API_KEY")
+    if not api_key:
+        return "Failed to initiate call: VAPI_API_KEY environment variable is not set."
 
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
