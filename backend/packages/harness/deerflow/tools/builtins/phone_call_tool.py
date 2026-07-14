@@ -30,8 +30,6 @@ def make_phone_call(phone_number: str, message: str) -> str:
             },
             "voice": {"provider": "11labs", "voiceId": "burt"},
         },
-        # You must purchase a number in Vapi dashboard and put its ID here:
-        "phoneNumberId": "YOUR_VAPI_PHONE_NUMBER_ID",
         "customer": {"number": phone_number},
     }
 
