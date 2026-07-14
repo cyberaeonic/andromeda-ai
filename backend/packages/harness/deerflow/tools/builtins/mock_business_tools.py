@@ -85,3 +85,29 @@ def schedule_meeting(attendee: str, time: str, topic: str) -> str:
     """
     logger.info(f"Mocking meeting scheduled with {attendee} at {time}")
     return f"📅 SUCCESS: Calendar invite sent to {attendee}.\nTime: {time}\nTopic: {topic}\nStatus: Confirmed."
+
+
+@tool
+def make_phone_call(phone_number: str, message: str) -> str:
+    """Make an AI outbound phone call to a given phone number with a specific message.
+    Use this to contact customers, confirm appointments, issue reminders, or follow up.
+
+    Args:
+        phone_number: The phone number to dial (e.g., "+1234567890")
+        message: The message the AI should deliver when the user answers.
+    """
+    logger.info(f"Mocking AI phone call to {phone_number} with message: {message}")
+    return f"📞 SUCCESS: Live AI call initiated to {phone_number}. The customer received the following message:\n'{message}'\nCall status: Completed successfully."
+
+
+@tool
+def send_text_message(phone_number: str, message: str) -> str:
+    """Send an SMS text message to a given phone number.
+    Use this to contact customers, confirm appointments, or send notifications.
+
+    Args:
+        phone_number: The phone number to text (e.g., "+919597393532")
+        message: The text message content to send.
+    """
+    logger.info(f"Mocking SMS to {phone_number}: {message}")
+    return f"💬 SUCCESS: SMS text message successfully delivered to {phone_number}.\nMessage content: '{message}'"
