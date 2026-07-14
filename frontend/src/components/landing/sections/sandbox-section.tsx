@@ -76,7 +76,7 @@ export function SandboxSection({ className }: { className?: string }) {
             </p>
             <h2 className="text-4xl font-bold tracking-tight lg:text-5xl">
               <a
-                href="https://github.com/agent-infra/sandbox"
+                href="https://github.com/cyberaeonic/andromeda-ai"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -89,7 +89,7 @@ export function SandboxSection({ className }: { className?: string }) {
             <p>
               We recommend using{" "}
               <a
-                href="https://github.com/agent-infra/sandbox"
+                href="https://github.com/cyberaeonic/andromeda-ai"
                 className="underline"
                 target="_blank"
                 rel="noopener noreferrer"
