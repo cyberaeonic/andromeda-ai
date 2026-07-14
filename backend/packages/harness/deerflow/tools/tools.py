@@ -7,6 +7,7 @@ from deerflow.config.app_config import AppConfig
 from deerflow.reflection import resolve_variable
 from deerflow.sandbox.security import is_host_bash_allowed
 from deerflow.tools.builtins import ask_clarification_tool, present_file_tool, task_tool, view_image_tool
+from deerflow.tools.builtins.mock_business_tools import create_instagram_post, send_whatsapp_message, update_inventory
 from deerflow.tools.builtins.phone_call_tool import make_phone_call
 from deerflow.tools.builtins.send_sms_tool import send_text_message
 from deerflow.tools.mcp_metadata import tag_mcp_tool
@@ -19,6 +20,9 @@ BUILTIN_TOOLS = [
     ask_clarification_tool,
     make_phone_call,
     send_text_message,
+    send_whatsapp_message,
+    create_instagram_post,
+    update_inventory,
 ]
 
 SUBAGENT_TOOLS = [
