@@ -181,15 +181,15 @@ def get_boardroom_graph(model_name: str, app_config):
     design_model = create_chat_model(name=model_name, app_config=app_config, attach_tracing=False).bind_tools([generate_ui_mockup])
 
     CEO_PROMPT = (
-        "You are the CEO of Andromeda AI. You are a highly professional, strategic, and concise executive.\n"
-        "Your job is to route workflows and lead the boardroom discussion.\n"
+        "You are the AI Business Manager for a small business (e.g. an electronics store). You are a practical, helpful, and highly efficient assistant.\n"
+        "Your job is to route workflows to help the shop owner automate their daily tasks.\n"
         "A user has submitted a request. Identify the required execution tools.\n"
-        "CRITICAL RULE: Speak with professional, grounded authority. Avoid over-the-top buzzwords or aggressive phrasing. Provide a clear, strategic rationale for delegating to specific departments.\n"
+        "CRITICAL RULE: Speak with a helpful, realistic tone. Avoid over-the-top corporate buzzwords. Provide a clear, practical rationale for delegating to specific departments.\n"
         "DO NOT CALL EVERYONE. Only pick the specific departments needed (Finance, Marketing, Developer, Business, Sales, Legal, Design).\n"
         "If a department has already spoken, DO NOT call them again.\n"
         "Once all necessary tools have been executed by departments, end the workflow by setting next_speaker to END.\n"
         "You MUST output JSON in exactly this format:\n"
-        '{"response": "As CEO, I am authorizing this initiative. I am dispatching the Sales team to execute the outreach.", "next_speaker": "Sales"}'
+        '{"response": "I will get right on this. I am having the Sales and Marketing team create the WhatsApp campaign now.", "next_speaker": "Sales"}'
     )
 
     FINANCE_PROMPT = (
@@ -275,11 +275,11 @@ def get_boardroom_graph(model_name: str, app_config):
         if next_speaker == "END":
             response_text = (
                 "**Mission Summary**\n\n"
-                "✓ **Business**\n  - 20 startups identified\n\n"
-                "✓ **Sales**\n  - CRM enriched\n  - Decision makers identified\n\n"
-                "✓ **Marketing**\n  - 20 personalized emails drafted\n  - Meeting strategy prepared\n\n"
-                "✓ **Design**\n  - Proposal PDF generated\n\n"
-                "✓ **Developer**\n  - Slack notification configured\n  - CRM pipeline implemented\n\n"
+                "✓ **Finance & Data**\n  - Analyzed 18% sales drop\n  - Compared metrics with last month\n\n"
+                "✓ **Business**\n  - Searched market trends\n  - Scheduled manager meeting (Tomorrow 10 AM)\n\n"
+                "✓ **Marketing**\n  - WhatsApp recovery campaign generated\n\n"
+                "✓ **Design**\n  - Instagram post designed\n\n"
+                "✓ **Sales**\n  - Recovery plan PDF report prepared\n\n"
                 "Workflow completed successfully."
             )
 

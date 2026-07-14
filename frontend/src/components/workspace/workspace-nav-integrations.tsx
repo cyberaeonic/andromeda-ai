@@ -20,12 +20,11 @@ import {
 } from "@/components/ui/sidebar";
 
 const integrations = [
-  { name: "Stripe", icon: CreditCard },
-  { name: "Slack", icon: MessageSquare },
-  { name: "Salesforce CRM", icon: Cloud },
-  { name: "HubSpot", icon: PieChart },
+  { name: "WhatsApp Business", icon: MessageSquare },
+  { name: "Instagram", icon: PieChart },
   { name: "Gmail", icon: Mail },
   { name: "Google Calendar", icon: Calendar },
+  { name: "Razorpay (UPI)", icon: CreditCard },
 ];
 
 export function WorkspaceNavIntegrations() {
