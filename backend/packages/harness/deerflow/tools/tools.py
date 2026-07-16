@@ -6,8 +6,14 @@ from deerflow.config import get_app_config
 from deerflow.config.app_config import AppConfig
 from deerflow.reflection import resolve_variable
 from deerflow.sandbox.security import is_host_bash_allowed
+from deerflow.skills.healthcare.billing import generate_bill
+from deerflow.skills.healthcare.communication import send_telegram_notification
+from deerflow.skills.healthcare.documents import generate_medical_report
+from deerflow.skills.healthcare.facilities import allocate_room
+from deerflow.skills.healthcare.reception import lookup_patient, register_patient
+from deerflow.skills.healthcare.scheduling import book_consultation
+from deerflow.skills.healthcare.triage import assign_doctor, triage_patient
 from deerflow.tools.builtins import ask_clarification_tool, present_file_tool, task_tool, view_image_tool
-from deerflow.tools.builtins.real_business_tools import analyze_sales_data, create_instagram_post, generate_pdf_report, make_phone_call, schedule_meeting, send_text_message, send_whatsapp_message, update_inventory
 from deerflow.tools.mcp_metadata import tag_mcp_tool
 from deerflow.tools.sync import make_sync_tool_wrapper
 
@@ -16,14 +22,15 @@ logger = logging.getLogger(__name__)
 BUILTIN_TOOLS = [
     present_file_tool,
     ask_clarification_tool,
-    make_phone_call,
-    send_text_message,
-    send_whatsapp_message,
-    create_instagram_post,
-    update_inventory,
-    analyze_sales_data,
-    generate_pdf_report,
-    schedule_meeting,
+    generate_bill,
+    send_telegram_notification,
+    generate_medical_report,
+    allocate_room,
+    lookup_patient,
+    register_patient,
+    book_consultation,
+    assign_doctor,
+    triage_patient,
 ]
 
 SUBAGENT_TOOLS = [
