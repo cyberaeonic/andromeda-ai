@@ -6,6 +6,7 @@ import { MilkyWayBackground } from "@/components/ui/milky-way-background";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { CommandPalette } from "@/components/workspace/command-palette";
 import { GatewayOfflineBanner } from "@/components/workspace/gateway-offline-banner";
+import { GlobalEventToast } from "@/components/workspace/global-event-toast";
 import { WorkspaceSidebar } from "@/components/workspace/workspace-sidebar";
 
 function parseSidebarOpenCookie(
@@ -44,6 +45,7 @@ export async function WorkspaceContent({
       </SidebarProvider>
       <CommandPalette />
       <Toaster position="top-center" />
+      <GlobalEventToast />
     </QueryClientProvider>
   );
 }
