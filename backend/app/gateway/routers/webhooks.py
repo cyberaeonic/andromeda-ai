@@ -75,7 +75,7 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
             f"INSTRUCTIONS:\n"
             f"1. Triage the patient based on symptoms.\n"
             f"2. Use the 'assign_doctor' tool to query the hospital's long-term memory for an available doctor matching the required specialty.\n"
-            f"3. Allocate a room and book pharmacy if needed.\n"
+            f"3. Allocate a room, and if the patient needs medication, you MUST use the 'check_pharmacy_inventory' tool to verify stock levels before you use the 'book_pharmacy_prescription' tool.\n"
             f"4. CRITICAL: For EVERY action you successfully book or complete "
             f"(e.g., assigning a doctor, booking a room, placing a pharmacy order), "
             f"you MUST immediately use the 'send_telegram_notification' tool to "
