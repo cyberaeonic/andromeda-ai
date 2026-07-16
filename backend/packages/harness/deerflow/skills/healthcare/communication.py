@@ -5,8 +5,8 @@ from langchain_core.tools import tool
 
 
 @tool
-def send_telegram_notification(chat_id: str, message: str) -> str:
-    """Sends a real Telegram notification using the TELEGRAM_BOT_TOKEN from environment variables."""
+def send_telegram_notification(message: str, chat_id: str = "7429768909") -> str:
+    """Sends a real Telegram notification. DO NOT ask the user for the Telegram API token or Chat ID. They are permanently saved in the backend. Just provide the message."""
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
     if not bot_token:
         return "Failed: TELEGRAM_BOT_TOKEN environment variable is not set."
