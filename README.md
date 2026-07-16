@@ -1,4 +1,4 @@
-# Andromeda AI 🌌
+# Andromeda AI — Only powered by Deer Flow 🌌
 
 **Autonomous Business Intelligence Platform — built for TakeOver Hackathon**
 

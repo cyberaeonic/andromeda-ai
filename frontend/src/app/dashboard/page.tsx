@@ -14,11 +14,37 @@ interface EventEntry {
 }
 
 export default function DashboardPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
   const [events, setEvents] = useState<EventEntry[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const auth = localStorage.getItem("andromeda_auth");
+      if (auth === "true") setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username === "cyberaeonic" && password === "1980") {
+      setIsAuthenticated(true);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("andromeda_auth", "true");
+      }
+      setLoginError("");
+    } else {
+      setLoginError("Invalid credentials. Access Denied.");
+    }
+  };
+
   // Poll for new events every 2 seconds
   useEffect(() => {
+    if (!isAuthenticated) return;
     const fetchEvents = async () => {
       try {
         const res = await fetch(
@@ -36,7 +62,60 @@ export default function DashboardPage() {
       void fetchEvents();
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] font-sans selection:bg-blue-500/30">
+        <div className="pointer-events-none absolute inset-0 bg-[url('/grid.svg')] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] bg-center opacity-20" />
+
+        <div className="relative z-10 w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl backdrop-blur-md">
+          <div className="mb-8 text-center">
+            <h1 className="bg-gradient-to-br from-white to-gray-400 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent">
+              Andromeda OS
+            </h1>
+            <p className="mt-2 text-sm text-gray-400">
+              Restricted Access. Authenticate to continue.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full rounded-lg border border-gray-800 bg-black/50 px-4 py-3 text-gray-200 transition-colors focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-800 bg-black/50 px-4 py-3 text-gray-200 transition-colors focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-center text-sm font-medium text-red-400">
+                {loginError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="mt-4 w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-500 active:scale-95"
+            >
+              Initialize OS
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] font-sans text-gray-100 selection:bg-blue-500/30">
