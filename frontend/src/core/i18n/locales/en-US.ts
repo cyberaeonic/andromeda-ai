@@ -219,7 +219,7 @@ export const enUS: Translations = {
     channels: "Channels",
     recentChats: "Recent chats",
     demoChats: "Demo chats",
-    agents: "Agents",
+    agents: "Apps",
     dataStudio: "Data Studio",
     strategicPlanning: "Strategic Planning",
     trendingNews: "Trends & News",
