@@ -75,8 +75,8 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
             f"INSTRUCTIONS:\n"
             f"1. Triage the patient based on symptoms.\n"
             f"2. Use the 'assign_doctor' tool to query the hospital's long-term memory for an available doctor matching the required specialty.\n"
-            f"3. Allocate a room and book pharmacy if needed.\n"
-            f"4. Finally, use the 'send_telegram_notification' tool to send a beautifully formatted Final Ticket to chat_id '{chat_id}' summarizing all actions taken.\n"
+            f"3. Allocate a room (reservation booking) and book pharmacy if needed.\n"
+            f"4. CRITICAL: As soon as the room reservation is booked, you MUST use the 'send_telegram_notification' tool to send a beautifully formatted HTML ticket to chat_id '{chat_id}' summarizing all actions taken.\n"
             f"Execute autonomously."
         )
 
