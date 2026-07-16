@@ -108,7 +108,15 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
 
         print(f"[WebhookRouter] Triggering AI for event: {event_name}")
         
-        # We assign owner_user_id="default" so this headless event appears in the user's normal Chat UI history.
+        # Explicitly create the thread in the database so it appears in the sidebar UI
+        from app.gateway.deps import get_thread_store
+        thread_store = get_thread_store(request)
+        try:
+            await thread_store.create(thread_id, metadata={"title": f"System Event: {event_name}"}, user_id="default")
+        except Exception as e:
+            print(f"[WebhookRouter] Failed to create thread meta: {e}")
+
+        # We assign owner_user_id="default" so this headless event belongs to the normal Chat UI history.
         await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id="default")
 
     # We clear and re-register to ensure the latest request context is used.
