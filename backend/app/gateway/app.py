@@ -1,5 +1,11 @@
 import asyncio
 import logging
+import os
+
+# Fail-safe fallback for OpenAI API key
+if not os.environ.get("OPENAI_API_KEY") and os.environ.get("FALL_API"):
+    os.environ["OPENAI_API_KEY"] = os.environ.get("FALL_API")
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
