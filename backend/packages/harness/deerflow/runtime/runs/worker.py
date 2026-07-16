@@ -558,6 +558,22 @@ async def run_agent(
                 "name": type(exc).__name__,
             },
         )
+        import traceback
+
+        import requests
+
+        bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+        if bot_token:
+            try:
+                tb = traceback.format_exc()
+                chat_id = "7429768909"
+                requests.post(
+                    f"https://api.telegram.org/bot{bot_token}/sendMessage",
+                    json={"chat_id": chat_id, "text": f"🚨 <b>Run ERROR in Andromeda OS agent:</b>\n{error_msg}\n<pre>{tb[-500:]}</pre>", "parse_mode": "HTML"},
+                    timeout=5,
+                )
+            except Exception:
+                pass
 
     finally:
         # Persist any subagent step events still buffered (#3779) — including on

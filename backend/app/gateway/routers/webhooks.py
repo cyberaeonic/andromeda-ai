@@ -70,7 +70,7 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
 
         # 2. Enrich the Prompt with explicit instructions for the Agent
         is_medical = "patient" in event_name.lower() or "medical" in event_name.lower() or "symptom" in str(payload).lower() or "hospital" in event_name.lower()
-        
+
         if is_medical:
             prompt = (
                 f"# Andromeda Healthcare Planner System Prompt\n\n"
@@ -106,17 +106,34 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
             )
 
         print(f"[WebhookRouter] Triggering AI for event: {event_name}")
-        
+
         # Explicitly create the thread in the database so it appears in the sidebar UI
         from app.gateway.deps import get_thread_store
+
         thread_store = get_thread_store(request)
         try:
             await thread_store.create(thread_id, metadata={"title": f"System Event: {event_name}"}, user_id="default")
         except Exception as e:
             print(f"[WebhookRouter] Failed to create thread meta: {e}")
 
-        # We assign owner_user_id="default" so this headless event belongs to the normal Chat UI history.
-        await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id="default")
+        try:
+            # We assign owner_user_id="default" so this headless event belongs to the normal Chat UI history.
+            await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id="default")
+        except Exception as e:
+            error_msg = f"Failed to launch thread: {str(e)}"
+            print(error_msg)
+            if bot_token and chat_id:
+                try:
+                    import traceback
+
+                    tb = traceback.format_exc()
+                    requests.post(
+                        f"https://api.telegram.org/bot{bot_token}/sendMessage",
+                        json={"chat_id": chat_id, "text": f"🚨 <b>ERROR in Andromeda OS webhook:</b>\n{error_msg}\n<pre>{tb[-500:]}</pre>", "parse_mode": "HTML"},
+                        timeout=5,
+                    )
+                except Exception as inner_e:
+                    print(f"Failed to send error telegram msg: {inner_e}")
 
     # We clear and re-register to ensure the latest request context is used.
     # In production, this would be a proper background job.
