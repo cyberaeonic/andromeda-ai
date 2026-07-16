@@ -69,27 +69,42 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 print(f"Failed to send initial telegram msg: {e}")
 
         # 2. Enrich the Prompt with explicit instructions for the Agent
-        prompt = (
-            f"# Andromeda Healthcare Planner System Prompt\n\n"
-            f"You are the autonomous planner for Andromeda Healthcare.\n\n"
-            f"Your responsibility is to coordinate hospital operations after receiving business events from the Event Bus.\n\n"
-            f"Never diagnose diseases or prescribe medication.\n\n"
-            f"Instead:\n"
-            f"* Analyze business events.\n"
-            f"* Delegate work to the appropriate healthcare skills.\n"
-            f"* Coordinate departments.\n"
-            f"* Generate administrative documents.\n"
-            f"* Notify stakeholders.\n"
-            f"* Explain your reasoning.\n"
-            f"* Escalate when resources are unavailable.\n\n"
-            f"Always prioritize patient safety and operational efficiency.\n\n"
-            f"System Event Detected: {event_name}.\n"
-            f"Payload details: {payload}.\n\n"
-            f"CRITICAL DEMO REQUIREMENT: For EVERY action you successfully book or complete "
-            f"(e.g., assigning a doctor, booking a room, generating the PDF), "
-            f"you MUST immediately use the 'send_telegram_notification' tool to "
-            f"send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination' and 'Clinical Draft Generated'."
-        )
+        is_medical = "patient" in event_name.lower() or "medical" in event_name.lower() or "symptom" in str(payload).lower() or "hospital" in event_name.lower()
+        
+        if is_medical:
+            prompt = (
+                f"# Andromeda Healthcare Planner System Prompt\n\n"
+                f"You are the autonomous planner for Andromeda Healthcare.\n\n"
+                f"Your responsibility is to coordinate hospital operations after receiving business events from the Event Bus.\n\n"
+                f"Never diagnose diseases or prescribe medication.\n\n"
+                f"Instead:\n"
+                f"* Analyze business events.\n"
+                f"* Delegate work to the appropriate healthcare skills.\n"
+                f"* Coordinate departments.\n"
+                f"* Generate administrative documents.\n"
+                f"* Notify stakeholders.\n"
+                f"* Explain your reasoning.\n"
+                f"* Escalate when resources are unavailable.\n\n"
+                f"Always prioritize patient safety and operational efficiency.\n\n"
+                f"System Event Detected: {event_name}.\n"
+                f"Payload details: {payload}.\n\n"
+                f"CRITICAL DEMO REQUIREMENT: For EVERY action you successfully book or complete "
+                f"(e.g., assigning a doctor, booking a room, generating the PDF), "
+                f"you MUST immediately use the 'send_telegram_notification' tool to "
+                f"send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination' and 'Clinical Draft Generated'."
+            )
+        else:
+            prompt = (
+                f"# Andromeda Business Planner System Prompt\n\n"
+                f"You are the autonomous planner for Andromeda AI.\n\n"
+                f"Your responsibility is to coordinate enterprise operations after receiving business events from the Event Bus.\n\n"
+                f"Analyze business events, delegate work to the appropriate skills, coordinate departments, generate administrative documents, and notify stakeholders.\n\n"
+                f"System Event Detected: {event_name}.\n"
+                f"Payload details: {payload}.\n\n"
+                f"CRITICAL DEMO REQUIREMENT: For EVERY action you successfully book or complete, "
+                f"you MUST immediately use the 'send_telegram_notification' tool to "
+                f"send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination'."
+            )
 
         print(f"[WebhookRouter] Triggering AI for event: {event_name}")
 
