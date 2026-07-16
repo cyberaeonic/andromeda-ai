@@ -10,6 +10,7 @@ from deerflow.skills.healthcare.billing import generate_bill
 from deerflow.skills.healthcare.communication import send_telegram_notification
 from deerflow.skills.healthcare.documents import generate_medical_report
 from deerflow.skills.healthcare.facilities import allocate_room
+from deerflow.skills.healthcare.pharmacy import book_pharmacy_prescription
 from deerflow.skills.healthcare.reception import lookup_patient, register_patient
 from deerflow.skills.healthcare.scheduling import book_consultation
 from deerflow.skills.healthcare.triage import assign_doctor, triage_patient
@@ -29,6 +30,7 @@ BUILTIN_TOOLS = [
     lookup_patient,
     register_patient,
     book_consultation,
+    book_pharmacy_prescription,
     assign_doctor,
     triage_patient,
 ]

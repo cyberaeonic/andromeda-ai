@@ -1,3 +1,4 @@
+import uuid
 from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Request
@@ -46,14 +47,14 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
     """
     source_url = str(request.url)
 
-    # Ensure the callback is registered (with the app attached so it can run)
-    async def ai_callback(event: dict[str, Any]):
-        DEMO_THREAD_ID = "watcher-demo-thread"
+    async def ai_callback(event: dict[str, Any], history_entry: dict):
+        thread_id = uuid.uuid4().hex
+        history_entry["thread_id"] = thread_id
         event_name = event.get("event", "unknown_event")
         payload = event.get("payload", {})
         prompt = f"System Event Detected: {event_name}. Payload details: {payload}. Please execute standard operating procedures autonomously."
 
-        await launch_scheduled_thread_run(thread_id=DEMO_THREAD_ID, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id=None)
+        await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id=None)
 
     # We clear and re-register to ensure the latest request context is used.
     # In production, this would be a proper background job.
@@ -64,3 +65,24 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
     watcher.receive_webhook(payload, source_url)
 
     return {"status": "received", "message": "Event queued for classification."}
+
+
+@router.get("/events")
+async def get_events():
+    """
+    Returns the recent event history for the dashboard.
+    """
+    return list(event_bus.event_history)
+
+
+@router.get("/events/{thread_id}/messages")
+async def get_thread_messages(thread_id: str, request: Request):
+    """
+    Returns the message history for a specific event thread for the dashboard.
+    Bypasses auth for the dashboard visualization.
+    """
+    from app.gateway.services import get_run_event_store
+
+    event_store = get_run_event_store(request)
+    messages = await event_store.list_messages(thread_id, limit=100)
+    return messages

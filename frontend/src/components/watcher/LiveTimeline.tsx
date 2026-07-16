@@ -18,94 +18,78 @@ interface TimelineEvent {
   description?: string;
 }
 
-export function LiveTimeline() {
-  const [events, setEvents] = useState<TimelineEvent[]>([
-    {
-      id: "1",
-      timestamp: new Date().toLocaleTimeString(),
-      type: "watch",
-      title: "Watching Google Forms...",
-      description: "Waiting for new patient registration.",
-    },
-  ]);
+interface BackendMessage {
+  id?: string;
+  created_at?: string;
+  content?: string;
+  event_type?: string;
+  name?: string;
+  role?: string;
+  kwargs?: Record<string, unknown>;
+}
 
-  // Simulate an incoming webhook event after 5 seconds for demonstration,
-  // since the actual backend SSE hook would require a running server and specific run_id.
+export function LiveTimeline({ threadId }: { threadId: string }) {
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+
   useEffect(() => {
-    const sequence = [
-      {
-        delay: 5000,
-        event: {
-          id: "2",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "trigger" as const,
-          title: "patient.registered",
-          description: "New row detected in Google Sheets.",
-        },
-      },
-      {
-        delay: 6000,
-        event: {
-          id: "3",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "planner" as const,
-          title: "Planner Started",
-          description: "LangGraph Agent determining next steps.",
-        },
-      },
-      {
-        delay: 8000,
-        event: {
-          id: "4",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "action" as const,
-          title: "Doctor Assigned: Dr. Rao",
-          description: "triage_patient and assign_doctor tools executed.",
-        },
-      },
-      {
-        delay: 10000,
-        event: {
-          id: "5",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "action" as const,
-          title: "Room Allocated: Room 204",
-          description: "allocate_room tool executed.",
-        },
-      },
-      {
-        delay: 12000,
-        event: {
-          id: "6",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "action" as const,
-          title: "Telegram Notification Sent",
-          description: "Sent deep-link to patient.",
-        },
-      },
-      {
-        delay: 13000,
-        event: {
-          id: "7",
-          timestamp: new Date().toLocaleTimeString(),
-          type: "complete" as const,
-          title: "Workflow Completed",
-          description: "All autonomous tasks finished successfully.",
-        },
-      },
-    ];
+    let active = true;
+    const fetchMessages = async () => {
+      if (!threadId) return;
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/webhooks/events/${threadId}/messages`,
+        );
+        const messages = await res.json();
 
-    const timeouts = sequence.map((step) => {
-      return setTimeout(() => {
-        setEvents((prev) => [
-          ...prev,
-          { ...step.event, timestamp: new Date().toLocaleTimeString() },
-        ]);
-      }, step.delay);
-    });
+        if (!active) return;
 
-    return () => timeouts.forEach(clearTimeout);
-  }, []);
+        // Map backend messages to Timeline events
+        const parsedEvents: TimelineEvent[] = messages.map(
+          (msg: BackendMessage) => {
+            let type: TimelineEvent["type"] = "planner";
+            let title = "Agent Processing";
+            let description = msg.content;
+
+            if (msg.event_type === "llm.tool_call") {
+              type = "action";
+              title = `Executing Tool: ${msg.name}`;
+              description = JSON.stringify(msg.kwargs);
+            } else if (msg.event_type === "llm.tool_result") {
+              type = "complete";
+              title = `Tool Result: ${msg.name}`;
+              description = msg.content;
+            } else if (msg.role === "user") {
+              type = "trigger";
+              title = "Business Event Received";
+            }
+
+            return {
+              id: msg.id ?? Math.random().toString(),
+              timestamp: new Date(
+                msg.created_at ?? Date.now(),
+              ).toLocaleTimeString(),
+              type,
+              title,
+              description,
+            };
+          },
+        );
+
+        setEvents(parsedEvents);
+      } catch (err) {
+        console.error("Failed to fetch thread messages:", err);
+      }
+    };
+
+    void fetchMessages();
+    const interval = setInterval(() => {
+      void fetchMessages();
+    }, 1500);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [threadId]);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -124,8 +108,17 @@ export function LiveTimeline() {
     }
   };
 
+  if (events.length === 0) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-gray-800 bg-gray-900/20 text-gray-500">
+        <Activity className="mb-4 h-8 w-8 animate-pulse" />
+        <p>Loading live stream...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
+    <div className="max-h-[600px] w-full overflow-y-auto rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
       <div className="space-y-6">
         <AnimatePresence>
           {events.map((evt, idx) => (
@@ -157,7 +150,9 @@ export function LiveTimeline() {
                   </span>
                 </div>
                 {evt.description && (
-                  <p className="text-sm text-gray-400">{evt.description}</p>
+                  <p className="overflow-x-auto font-mono text-sm text-xs whitespace-pre-wrap text-gray-400">
+                    {evt.description}
+                  </p>
                 )}
               </div>
             </motion.div>

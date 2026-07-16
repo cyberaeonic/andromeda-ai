@@ -1,5 +1,7 @@
 import asyncio
+from collections import deque
 from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 
 from .classifier import EventClassifier
@@ -19,6 +21,7 @@ class EventBus:
             cls._instance = super().__new__(cls)
             cls._instance.classifier = EventClassifier("healthcare")
             cls._instance.planner_callbacks = []
+            cls._instance.event_history = deque(maxlen=100)
         return cls._instance
 
     def register_planner_callback(self, callback: Callable[[dict[str, Any]], None]):
@@ -32,11 +35,21 @@ class EventBus:
 
         if business_event:
             print(f"[EventBus] Classified as Business Event: {business_event['event']}")
-            self._dispatch_to_planner(business_event)
+
+            # Store in history before dispatching so the dashboard can see it immediately
+            history_entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "event": business_event.get("event"),
+                "payload": business_event.get("payload"),
+                "thread_id": None,  # Will be populated by the callback
+            }
+            self.event_history.appendleft(history_entry)
+
+            self._dispatch_to_planner(business_event, history_entry)
         else:
             print("[EventBus] Raw change ignored (no matching business event).")
 
-    def _dispatch_to_planner(self, business_event: dict[str, Any]):
+    def _dispatch_to_planner(self, business_event: dict[str, Any], history_entry: dict):
         """Dispatches the event to the LangGraph AI."""
         # We need to run the callbacks in an async context if they are async.
         # But we might be in a sync thread (like FileWatcher).
@@ -48,12 +61,12 @@ class EventBus:
                 if asyncio.iscoroutinefunction(callback):
                     try:
                         loop = asyncio.get_running_loop()
-                        loop.create_task(callback(business_event))
+                        loop.create_task(callback(business_event, history_entry))
                     except RuntimeError:
                         # No running loop (we are in a worker thread)
-                        asyncio.run(callback(business_event))
+                        asyncio.run(callback(business_event, history_entry))
                 else:
-                    callback(business_event)
+                    callback(business_event, history_entry)
             except Exception as e:
                 print(f"[EventBus] Failed to dispatch to planner: {e}")
 
