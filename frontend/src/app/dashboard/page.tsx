@@ -21,7 +21,9 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/webhooks/events");
+        const res = await fetch(
+          "https://andromeda-ai-production.up.railway.app/api/webhooks/events",
+        );
         const data: EventEntry[] = await res.json();
         setEvents(data);
       } catch (err) {

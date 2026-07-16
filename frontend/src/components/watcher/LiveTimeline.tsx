@@ -37,7 +37,7 @@ export function LiveTimeline({ threadId }: { threadId: string }) {
       if (!threadId) return;
       try {
         const res = await fetch(
-          `http://localhost:8000/api/webhooks/events/${threadId}/messages`,
+          `https://andromeda-ai-production.up.railway.app/api/webhooks/events/${threadId}/messages`,
         );
         const messages = await res.json();
 
