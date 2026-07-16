@@ -69,7 +69,7 @@ export default function DashboardPage() {
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] font-sans selection:bg-blue-500/30">
         <div className="pointer-events-none absolute inset-0 bg-[url('/grid.svg')] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] bg-center opacity-20" />
 
-        <div className="relative z-10 w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative z-10 w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
           <div className="mb-8 text-center">
             <h1 className="bg-gradient-to-br from-white to-gray-400 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent">
               Andromeda OS

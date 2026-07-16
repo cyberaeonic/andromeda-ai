@@ -118,7 +118,7 @@ export function LiveTimeline({ threadId }: { threadId: string }) {
   }
 
   return (
-    <div className="max-h-[600px] w-full overflow-y-auto rounded-xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
+    <div className="max-h-[600px] w-full overflow-y-auto overflow-x-hidden rounded-xl border border-gray-800 bg-gray-900 p-4 sm:p-6 shadow-2xl">
       <div className="space-y-6">
         <AnimatePresence>
           {events.map((evt, idx) => (
@@ -142,7 +142,7 @@ export function LiveTimeline({ threadId }: { threadId: string }) {
               {/* Content */}
               <div className="rounded-lg border border-gray-700/50 bg-gray-800/40 p-4 shadow-md backdrop-blur-sm transition-colors hover:bg-gray-800/60">
                 <div className="mb-1 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-100">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 break-words">
                     {evt.title}
                   </h3>
                   <span className="rounded bg-gray-950 px-2 py-1 font-mono text-xs text-gray-400">
@@ -150,7 +150,7 @@ export function LiveTimeline({ threadId }: { threadId: string }) {
                   </span>
                 </div>
                 {evt.description && (
-                  <p className="overflow-x-auto font-mono text-sm text-xs whitespace-pre-wrap text-gray-400">
+                  <p className="overflow-x-auto font-mono text-xs whitespace-pre-wrap break-words text-gray-400">
                     {evt.description}
                   </p>
                 )}
