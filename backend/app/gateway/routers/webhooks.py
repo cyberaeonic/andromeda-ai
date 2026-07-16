@@ -88,10 +88,12 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 f"Always prioritize patient safety and operational efficiency.\n\n"
                 f"System Event Detected: {event_name}.\n"
                 f"Payload details: {payload}.\n\n"
-                f"CRITICAL DEMO REQUIREMENT: For EVERY action you successfully book or complete "
-                f"(e.g., assigning a doctor, booking a room, generating the PDF), "
-                f"you MUST immediately use the 'send_telegram_notification' tool to "
-                f"send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination' and 'Clinical Draft Generated'."
+                f"CRITICAL INSTRUCTIONS:\n"
+                f"1. You MUST use the 'triage_patient' tool first to determine the severity and room requirement.\n"
+                f"2. You MUST use the 'allocate_room' tool to find an available room for the patient.\n"
+                f"3. You MUST use the 'assign_doctor' tool to assign an available specialist.\n"
+                f"4. ONLY after doing the above, use the 'generate_admission_document' tool to create the PDF report.\n"
+                f"5. FINALLY, use the 'send_telegram_notification' tool to send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination' and summarize the actions taken."
             )
         else:
             prompt = (
@@ -101,9 +103,10 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 f"Analyze business events, delegate work to the appropriate skills, coordinate departments, generate administrative documents, and notify stakeholders.\n\n"
                 f"System Event Detected: {event_name}.\n"
                 f"Payload details: {payload}.\n\n"
-                f"CRITICAL DEMO REQUIREMENT: For EVERY action you successfully book or complete, "
-                f"you MUST immediately use the 'send_telegram_notification' tool to "
-                f"send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination'."
+                f"CRITICAL INSTRUCTIONS:\n"
+                f"1. You MUST analyze the payload and use the appropriate scheduling, facility, or billing tools to handle the event.\n"
+                f"2. You MUST use the 'generate_admission_document' (or equivalent document) tool to create a physical record.\n"
+                f"3. FINALLY, use the 'send_telegram_notification' tool to send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination'."
             )
 
         print(f"[WebhookRouter] Triggering AI for event: {event_name}")
