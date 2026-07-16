@@ -51,9 +51,9 @@ export const MessageContent = ({
       "is-user:dark flex w-fit max-w-full min-w-0 flex-col gap-2 overflow-visible",
       "group-[.is-user]:overflow-hidden",
       "group-[.is-user]:bg-secondary group-[.is-user]:text-foreground group-[.is-user]:ml-auto group-[.is-user]:rounded-lg group-[.is-user]:px-4 group-[.is-user]:py-3",
-      "group-[.is-assistant]:text-foreground",
+      "group-[.is-assistant]:text-white",
       agentName
-        ? "group-[.is-assistant]:my-2 group-[.is-assistant]:rounded-xl group-[.is-assistant]:border group-[.is-assistant]:bg-slate-50 group-[.is-assistant]:p-5 group-[.is-assistant]:shadow-sm group-[.is-assistant]:dark:bg-slate-900"
+        ? "group-[.is-assistant]:my-2 group-[.is-assistant]:rounded-xl group-[.is-assistant]:border group-[.is-assistant]:bg-slate-900 group-[.is-assistant]:p-5 group-[.is-assistant]:shadow-sm"
         : "",
       className,
     )}
