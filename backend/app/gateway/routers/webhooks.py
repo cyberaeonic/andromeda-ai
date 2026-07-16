@@ -1,6 +1,8 @@
+import os
 import uuid
 from typing import Any
 
+import requests
 from fastapi import APIRouter, BackgroundTasks, Request
 
 from app.gateway.services import launch_scheduled_thread_run
@@ -52,7 +54,33 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
         history_entry["thread_id"] = thread_id
         event_name = event.get("event", "unknown_event")
         payload = event.get("payload", {})
-        prompt = f"System Event Detected: {event_name}. Payload details: {payload}. Please execute standard operating procedures autonomously."
+
+        # 1. Immediate Telegram Visibility
+        chat_id = payload.get("chat_id") or payload.get("patient_telegram_chat_id") or payload.get("Telegram Chat ID") or "7429768909"
+        bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+        if bot_token and chat_id:
+            try:
+                requests.post(
+                    f"https://api.telegram.org/bot{bot_token}/sendMessage",
+                    json={"chat_id": chat_id, "text": "🚨 <b>Andromeda OS:</b> New Patient Data Received.\n\nAnalyzing symptoms and checking long-term memory for doctor availability...", "parse_mode": "HTML"},
+                    timeout=5,
+                )
+            except Exception as e:
+                print(f"Failed to send initial telegram msg: {e}")
+
+        # 2. Enrich the Prompt with explicit instructions for the Agent
+        prompt = (
+            f"System Event Detected: {event_name}.\n"
+            f"Payload details: {payload}.\n\n"
+            f"INSTRUCTIONS:\n"
+            f"1. Triage the patient based on symptoms.\n"
+            f"2. Use the 'assign_doctor' tool to query the hospital's long-term memory for an available doctor matching the required specialty.\n"
+            f"3. Allocate a room and book pharmacy if needed.\n"
+            f"4. Finally, use the 'send_telegram_notification' tool to send a beautifully formatted Final Ticket to chat_id '{chat_id}' summarizing all actions taken.\n"
+            f"Execute autonomously."
+        )
+
+        print(f"[WebhookRouter] Triggering AI for event: {event_name}")
 
         await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id=None)
 
