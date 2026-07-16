@@ -107,8 +107,9 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
             )
 
         print(f"[WebhookRouter] Triggering AI for event: {event_name}")
-
-        await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id=None)
+        
+        # We assign owner_user_id="default" so this headless event appears in the user's normal Chat UI history.
+        await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id="default")
 
     # We clear and re-register to ensure the latest request context is used.
     # In production, this would be a proper background job.
