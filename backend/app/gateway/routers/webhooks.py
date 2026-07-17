@@ -100,7 +100,9 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 f"<b>Assigned Doctor:</b> [Insert Result]\n"
                 f"<b>Report:</b> Generated ✅\n"
                 f"━━━━━━━━━━━━━━━━━━━━━━\n"
-                f"<i>All autonomous steps completed successfully.</i>"
+                f"<i>All autonomous steps completed successfully.</i>\n\n"
+                f"6. Finally, your own response to the user in this chat MUST be a beautiful Markdown summary of the operations,\n"
+                f"using bolding, lists, and emojis. Do not just say 'I sent the telegram message'. Present the final ticket to the user here as well."
             )
         else:
             prompt = (

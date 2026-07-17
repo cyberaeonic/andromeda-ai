@@ -12,7 +12,18 @@ def send_telegram_notification(message: str, chat_id: str = "7429768909") -> str
         return "Failed: TELEGRAM_BOT_TOKEN environment variable is not set."
 
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
+
+    # Clean up the message just in case the LLM wrapped it in a markdown block or used markdown bolding
+    clean_message = message.strip()
+    if clean_message.startswith("```html"):
+        clean_message = clean_message[7:]
+    if clean_message.startswith("```"):
+        clean_message = clean_message[3:]
+    if clean_message.endswith("```"):
+        clean_message = clean_message[:-3]
+    clean_message = clean_message.replace("**", "<b>").replace("**", "</b>")  # LLMs often use ** for bolding
+
+    payload = {"chat_id": chat_id, "text": clean_message.strip(), "parse_mode": "HTML"}
 
     try:
         response = requests.post(url, json=payload, timeout=10)
