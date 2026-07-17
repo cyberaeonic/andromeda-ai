@@ -118,7 +118,7 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
 
         try:
             # We assign owner_user_id="default" so this headless event belongs to the normal Chat UI history.
-            await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, request=request, owner_user_id="default")
+            await launch_scheduled_thread_run(thread_id=thread_id, assistant_id="lead_agent", prompt=prompt, app=request.app, owner_user_id="default")
         except Exception as e:
             error_msg = f"Failed to launch thread: {str(e)}"
             print(error_msg)
