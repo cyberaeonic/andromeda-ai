@@ -91,7 +91,16 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 f"2. You MUST use the 'allocate_room' tool to find an available room for the patient based on their condition.\n"
                 f"3. You MUST use the 'assign_doctor' tool to assign an available specialist (e.g., Internal Medicine, Surgery).\n"
                 f"4. ONLY after doing the above, use the 'generate_medical_report' tool to create the PDF record.\n"
-                f"5. FINALLY, use the 'send_telegram_notification' tool to send a live update ticket to chat_id '{chat_id}'. Your telegram messages should be framed as 'Operations Coordination' and summarize the actions taken."
+                f"5. FINALLY, use the 'send_telegram_notification' tool to send a live update ticket to chat_id '{chat_id}'. Your telegram messages MUST be formatted EXACTLY like this using HTML tags:\n"
+                f"🚨 <b>Andromeda OS: Operations Coordination</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"<b>Patient:</b> [Insert Patient Name]\n"
+                f"<b>Triage Level:</b> [Insert Result]\n"
+                f"<b>Assigned Room:</b> [Insert Result]\n"
+                f"<b>Assigned Doctor:</b> [Insert Result]\n"
+                f"<b>Report:</b> Generated ✅\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"<i>All autonomous steps completed successfully.</i>"
             )
         else:
             prompt = (
