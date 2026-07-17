@@ -87,7 +87,7 @@ async def watcher_webhook(payload: dict[str, Any], request: Request, background_
                 f"* Escalate when resources are unavailable.\n\n"
                 f"Payload details: {payload}.\n\n"
                 f"CRITICAL INSTRUCTIONS:\n"
-                f"1. You MUST use the 'triage_patient' tool first to determine the severity. Use the 'Decubitus Risk' from the payload as a proxy for symptoms, and dummy data for vitals.\n"
+                f"1. You MUST use the 'triage_patient' tool first to determine the severity. Use the 'Decubitus Risk' from the payload as a proxy for symptoms, and an empty JSON object {{}} for vitals.\n"
                 f"2. You MUST use the 'allocate_room' tool to find an available room for the patient based on their condition.\n"
                 f"3. You MUST use the 'assign_doctor' tool to assign an available specialist (e.g., Internal Medicine, Surgery).\n"
                 f"4. ONLY after doing the above, use the 'generate_medical_report' tool to create the PDF record.\n"
