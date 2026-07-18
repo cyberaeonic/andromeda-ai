@@ -1,53 +1,54 @@
-# Andromeda AI — Only powered by Deer Flow 🌌
+# 🚀 Andromeda OS: The Autonomous Operations Coordinator
 
-**Autonomous Business Intelligence Platform — built for TakeOver Hackathon**
-
-
+**Built for the Takeover Hackathon (NIAT) — Powered by Deer Flow**
 
 ---
 
-## Problem Statement
+## 🛑 The Problem
 
-Businesses lack intelligent systems that can automatically execute multi-step workflows — research, analysis, and reporting — without a human manually driving every step. Andromeda AI addresses this by giving business owners autonomous agents that take a single prompt and independently research, analyze, and produce a finished deliverable.
+Current business software is entirely passive. Whether it's a hospital, hotel, or retail store, staff are forced to manually click through screens to enter data, book rooms, generate reports, and notify other departments. This manual data entry delays care and service, causes employee burnout, and creates massive bottlenecks during busy shifts.
 
-## What is Andromeda AI?
+## 💡 The Solution: Active, Agentic AI
 
-Andromeda AI is an autonomous business intelligence platform that lets you:
+**Andromeda OS** is not a standard chatbot that just answers trivia questions. It is an **Agentic AI**—an autonomous digital manager that actively runs your operations in the real world. 
 
-- 🤖 **AI Business Chat** — Context-aware enterprise assistant
-- 📊 **Data Studio** — Upload & analyze CSV/Excel with real Python execution
-- 🔁 **Autonomous Workflows** — Multi-step agents that research, analyze & report without prompting
-- 🎯 **Strategic Planning** — KPI tracking & roadmap boards
-- 📰 **Trends & News** — Real-time market intelligence via web search
-- 📅 **Business Schedule** — Automated workflow scheduling
+When a business event occurs (e.g., a new patient arrives or a booking is made via Google Sheets), Andromeda OS wakes up in the background, reasons about the event, and autonomously fires a sequence of real-world tools to handle the entire workflow completely hands-free.
 
-## Autonomous Workflow Agents (Live)
+---
 
-| Agent | What it does |
-|-------|-------------|
-| 📊 Data Intelligence Pipeline | Upload CSV → Python analysis → DuckDB queries → Executive Report |
-| 🔍 Market Intelligence Scout | Company/Industry → 4-phase web research → Competitive Brief |
-| 📋 Executive Weekly Briefing | Business context → KPI benchmarks + trends → Board-ready document |
+## 🔥 Key Features (Live Demo Capabilities)
 
-Each of these runs autonomously end-to-end from a single prompt — no step-by-step hand-holding required.
+Andromeda OS operates entirely headlessly via webhooks, acting as the invisible brain of your business operations.
 
-## 💼 The Boardroom: Multi-Agent Executive Team (Live!)
+### 🏥 Healthcare Triage Example (Live Demo)
+1. **Google Sheets Webhook:** A new patient is added to an intake Google Sheet.
+2. **Autonomous Triage:** Andromeda OS calls the `triage_patient` tool to analyze symptoms.
+3. **Resource Allocation:** It calls `allocate_room` to find an available bed.
+4. **Staff Assignment:** It calls `assign_doctor` to find the correct specialist.
+5. **Document Generation:** It calls `generate_medical_report` to create a physical PDF record.
+6. **Live Notifications:** It calls `send_telegram_notification` to instantly send a beautifully formatted HTML operations ticket directly to the staff's phones.
 
-The core feature of Andromeda AI is the **Boardroom**, where a CEO agent moderates a discussion between specialized AI executives (Finance, Sales, Marketing, Developer, etc.). We've armed these agents with **real business automation super-tools**:
+*All of this happens in 3 seconds, with 0 human button-clicks.*
 
-| Agent | Super-Tool | Hackathon-Ready Capability |
-|-------|------------|----------------------------|
-| 💰 **Sales** | `generate_payment_link` | Instantly generates Stripe checkout URLs to close deals |
-| 💰 **Sales** | `send_slack_webhook` | Pings the team Slack channel when a lead is captured |
-| 💰 **Sales** | `add_crm_lead` | Automatically records lead data (Name, Company) to a local CRM |
-| 👔 **Business** | `generate_pdf_proposal` | Typesets and saves real, downloadable PDF contracts/invoices |
-| 👔 **Business** | `schedule_meeting` | Generates `.ics` calendar invites for Google Calendar/Outlook |
-| 📈 **Finance** | `web_search_tool` | Scours the internet for live market data, stock prices, and income reports |
-| 📧 **Global** | `send_email` | Sends real SMTP outreach emails to prospects (with Safe Simulation mode) |
+### 🏨 Adaptable for Any Industry
+Because it is powered by an LLM with access to an arsenal of tools, it can instantly be adapted for:
+- **Hotels / Hostels:** Autonomously checking in guests, generating invoices, and messaging housekeeping.
+- **Retail:** Updating inventory levels, contacting suppliers, and logging sales.
+- **Service Businesses:** Booking appointments, processing Stripe payments, and sending Slack webhooks.
 
-All tools execute with beautiful **Native Markdown Terminal UI** blocks right in the chat console so you can watch your AI business run itself in real-time.
+---
 
-## Quick Start
+## 🛠️ The Tech Stack
+
+- **Agentic Framework:** LangGraph (Python)
+- **Backend API:** FastAPI 
+- **Frontend UI:** Next.js 15, TypeScript, Tailwind CSS
+- **Database:** SQLite / DuckDB
+- **Integrations:** Telegram Bot API, Google Apps Script Webhooks
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 make dev       # Start development server
@@ -55,17 +56,6 @@ make start     # Start production server
 make stop      # Stop all services
 ```
 
-## Stack
-
-- **Frontend:** Next.js 15, TypeScript, Tailwind CSS
-- **Backend:** Python, FastAPI, LangGraph
-- **AI:** LLM-powered autonomous agents with real code execution
-- **Data:** DuckDB, Pandas, Matplotlib
-
-## Acknowledgments
-
-Built on an internal agent-platform scaffold, extended with custom autonomous workflow agents, Data Studio, and Strategic Planning modules for this hackathon.
-
 ---
 
-© Built for Takeover hackthon NIAT.
+© Built for Takeover Hackathon NIAT.
